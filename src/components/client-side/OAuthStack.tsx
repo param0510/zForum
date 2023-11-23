@@ -1,24 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { signIn } from "next-auth/react";
+import { redirect } from "next/navigation";
+import { useState } from "react";
 import { Button } from "../custom/Button";
 import { Icons } from "../custom/Icons";
-import { signIn, useSession } from "next-auth/react";
-import { redirect } from "next/navigation";
 
 const OAuthStack = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const { data: session } = useSession();
-  useEffect(() => {
-    console.log(session);
-  }, [session]);
 
   const oAuthSignIn = async () => {
     setIsLoading(true);
     try {
-      await signIn("google");
-
-      redirect("/");
+      await signIn("google", { callbackUrl: `${window.location.origin}` });
     } catch (err) {
       console.log(err);
     } finally {

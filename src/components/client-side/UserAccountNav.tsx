@@ -8,11 +8,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/shadcn-ui/DropdownMenu";
-import UserAvatar from "../custom/UserAvatar";
 import { Session } from "next-auth";
-import { FC } from "react";
 import { signOut } from "next-auth/react";
-import { Button } from "../custom/Button";
+import { FC } from "react";
+import UserAvatar from "../custom/UserAvatar";
 
 // props
 interface UserAccountNavProps {
@@ -20,20 +19,27 @@ interface UserAccountNavProps {
 }
 
 const UserAccountNav: FC<UserAccountNavProps> = ({ session }) => {
+  // console.log("session", session);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
         <UserAvatar imgUrl={session?.user?.image ?? ""} />
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 bg-black/50 text-white">
+      <DropdownMenuContent align="end" className="w-56 bg-black/50 text-white">
         <DropdownMenuLabel>Options</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem>Feed</DropdownMenuItem>
+        <DropdownMenuItem>Create Community</DropdownMenuItem>
         <DropdownMenuItem>Settings</DropdownMenuItem>
         <DropdownMenuItem
-          onClick={async () => {
-            await signOut();
+          onClick={(e) => {
+            e.preventDefault();
+            signOut({
+              callbackUrl: `${window.location.origin}/sign-in`,
+            });
           }}
+          className="cursor-pointer"
         >
           Logout
         </DropdownMenuItem>

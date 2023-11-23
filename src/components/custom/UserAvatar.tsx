@@ -1,8 +1,6 @@
-"use client";
+import { AvatarProps } from "@radix-ui/react-avatar";
 import { FC } from "react";
 import { Avatar, AvatarFallback, AvatarImage } from "../shadcn-ui/Avatar";
-import { signOut } from "next-auth/react";
-import { AvatarProps } from "@radix-ui/react-avatar";
 
 interface UserAvatarProps extends AvatarProps {
   imgUrl: string;

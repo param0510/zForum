@@ -1,10 +1,8 @@
-import { FC } from "react";
-import UserAvatar from "../custom/UserAvatar";
-import { Button, buttonVariants } from "../custom/Button";
-import Link from "next/link";
-import { Icons } from "../custom/Icons";
 import { getServerAuthSession } from "@/lib/auth";
+import Link from "next/link";
 import UserAccountNav from "../client-side/UserAccountNav";
+import { buttonVariants } from "../custom/Button";
+import { Icons } from "../custom/Icons";
 
 const Navbar = async () => {
   const session = await getServerAuthSession();
