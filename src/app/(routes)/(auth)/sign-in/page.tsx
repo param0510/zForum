@@ -2,7 +2,7 @@ import OAuthStack from "@/components/client-side/OAuthStack";
 import { Button } from "@/components/custom/Button";
 import React from "react";
 
-const SignIn = () => {
+const SignInPage = () => {
   return (
     <>
       <h3>Welcome</h3>
@@ -12,4 +12,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default SignInPage;

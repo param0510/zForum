@@ -7,7 +7,7 @@ export const metadata = {
   description: "An e-Forum web app similar to stack_overflow/reddit",
 };
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
   authModal,
 }: {

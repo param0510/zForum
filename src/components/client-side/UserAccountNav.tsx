@@ -12,6 +12,7 @@ import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
 import { FC } from "react";
 import UserAvatar from "../custom/UserAvatar";
+import Link from "next/link";
 
 // props
 interface UserAccountNavProps {
@@ -29,8 +30,12 @@ const UserAccountNav: FC<UserAccountNavProps> = ({ session }) => {
       <DropdownMenuContent align="end" className="w-56 bg-black/50 text-white">
         <DropdownMenuLabel>Options</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem>Feed</DropdownMenuItem>
-        <DropdownMenuItem>Create Community</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/">Feed</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/c/create">Create Community</Link>
+        </DropdownMenuItem>
         <DropdownMenuItem>Settings</DropdownMenuItem>
         <DropdownMenuItem
           onClick={(e) => {

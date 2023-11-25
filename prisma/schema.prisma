@@ -11,6 +11,13 @@ datasource db {
   relationMode = "prisma"
 }
 
+//User defined custom types
+enum VoteType {
+  UP
+  DOWN
+}
+
+// Models from next-auth
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -49,4 +56,90 @@ model User {
   image    String?
   accounts Account[]
   sessions Session[]
+
+  // Added by @param. For extending the (1 -> many) or (many -> many) relations
+  createdCommunities Community[]
+  subscriptions      Subscription[]
+  posts              Post[]
+  comments           Comment[]
+  postVotes          PostVote[]
+  commentVotes       CommentVote[]
+}
+
+// Models Created By @param
+
+model Community {
+  id          String         @id @default(cuid())
+  name        String         @unique
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  creatorId   String
+  creator     User           @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  subscribers Subscription[]
+  posts       Post[]
+}
+
+model Subscription {
+  userId      String
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  communityId String
+  community   Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+
+  @@id([userId, communityId])
+}
+
+model Post {
+  id          String     @id @default(cuid())
+  title       String
+  content     Json?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  authorId    String
+  author      User       @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  communityId String
+  community   Community  @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  comments    Comment[]
+  votes       PostVote[]
+}
+
+model Comment {
+  id             String        @id @default(cuid())
+  text           String
+  createdAt      DateTime      @default(now())
+  authorId       String
+  author         User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  postId         String
+  post           Post          @relation(fields: [postId], references: [id], onDelete: Cascade)
+  replyToId      String?
+  replyToComment Comment?      @relation(name: "replyComment", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  replies        Comment[]     @relation(name: "replyComment")
+  votes          CommentVote[]
+  // commentId      String?
+}
+
+// model Vote {
+//   id       String     @id @default(cuid())
+//   voteType String
+// }
+
+model PostVote {
+  userId   String
+  user     User     @relation(fields: [userId], references: [id])
+  // voteId String @unique
+  // vote   Vote   @relation(fields: [voteId], references: [id])
+  voteType VoteType
+  postId   String
+  post     Post     @relation(fields: [postId], references: [id])
+
+  @@id([userId, postId])
+}
+
+model CommentVote {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  voteType  VoteType
+  commentId String
+  comment   Comment  @relation(fields: [commentId], references: [id])
+
+  @@id([userId, commentId])
 }
