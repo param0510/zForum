@@ -16,6 +16,7 @@ export const authOptions: NextAuthOptions = {
   // Sets the strategy to json-web-token
   session: {
     strategy: "jwt",
+    maxAge: 60 * 5, // sets the max age of the session
   },
   // You can set multiple providers here: Github | CredentialsProvider - "Used for custom login form" | Facebook ...
   providers: [

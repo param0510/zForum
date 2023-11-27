@@ -77,6 +77,8 @@ model Community {
   creator     User           @relation(fields: [creatorId], references: [id], onDelete: Cascade)
   subscribers Subscription[]
   posts       Post[]
+  // Check if this one's needed
+  // @@index([name])
 }
 
 model Subscription {
@@ -114,6 +116,7 @@ model Comment {
   replyToComment Comment?      @relation(name: "replyComment", fields: [replyToId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   replies        Comment[]     @relation(name: "replyComment")
   votes          CommentVote[]
+  // Check if this one's needed
   // commentId      String?
 }
 
@@ -123,13 +126,13 @@ model Comment {
 // }
 
 model PostVote {
-  userId   String
-  user     User     @relation(fields: [userId], references: [id])
+  userId String
+  user   User     @relation(fields: [userId], references: [id])
   // voteId String @unique
   // vote   Vote   @relation(fields: [voteId], references: [id])
-  voteType VoteType
-  postId   String
-  post     Post     @relation(fields: [postId], references: [id])
+  type   VoteType
+  postId String
+  post   Post     @relation(fields: [postId], references: [id])
 
   @@id([userId, postId])
 }
@@ -137,7 +140,7 @@ model PostVote {
 model CommentVote {
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  voteType  VoteType
+  type      VoteType
   commentId String
   comment   Comment  @relation(fields: [commentId], references: [id])
 
