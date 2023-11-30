@@ -16,7 +16,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-slate-600 text-white">
+      <body className="text- bg-slate-600">
         <Providers>
           <header>
             {/* @ts-expect-error Server Component */}

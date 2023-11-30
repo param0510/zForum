@@ -2,13 +2,13 @@ import { Post } from "@prisma/client";
 import { Session } from "next-auth";
 import { FC } from "react";
 
-interface PostsProps {
+interface PostListProps {
   posts: Post[];
   session: Session | null;
 }
 
-const Posts: FC<PostsProps> = ({ posts }) => {
+const PostList: FC<PostListProps> = ({ posts }) => {
   return <div>Posts</div>;
 };
 
-export default Posts;
+export default PostList;

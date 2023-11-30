@@ -5,7 +5,9 @@ export default function HomePage() {
     <div>
       <div>Home</div>
       <div>Test Del Component</div>
-      <TestDel />
+      <div className="border-2 ">
+        <TestDel />
+      </div>
     </div>
   );
 }

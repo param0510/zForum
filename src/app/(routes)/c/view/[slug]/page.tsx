@@ -1,19 +1,20 @@
 import { CreatePost } from "@/components/client-side/CreatePost";
-import { Button } from "@/components/custom/Button";
+import { buttonVariants } from "@/components/custom/Button";
 import CommunityDetails from "@/components/server-side/CommunityDetails";
-import Posts from "@/components/server-side/Posts";
+import PostList from "@/components/server-side/PostList";
 import { getServerAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import axios from "axios";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { FC } from "react";
 
-interface PageProps {
+interface CommunityViewPageProps {
   params: {
     slug: string;
   };
 }
-const CommunityViewPage = async ({ params: { slug } }: PageProps) => {
+const CommunityViewPage = async ({
+  params: { slug },
+}: CommunityViewPageProps) => {
   const session = await getServerAuthSession();
   const communityDetails = await db.community.findUnique({
     where: {
@@ -30,20 +31,12 @@ const CommunityViewPage = async ({ params: { slug } }: PageProps) => {
 
   return (
     <>
-      <h2>{slug}</h2>
-      <div className="container mx-auto mt-12 flex gap-3 max-lg:flex-col">
-        {/* Post List */}
-        <div className="flex flex-grow flex-col gap-3">
-          <CreatePost />
-          <Posts posts={communityDetails.posts} session={session} />
-        </div>
-        {/* Community Details */}
-        {/* @ts-expect-error Server Side Async component */}
-        <CommunityDetails
-          community={{ ...communityDetails }}
-          session={session}
-        />
-      </div>
+      <h1 className="mb-6 text-5xl">{slug}</h1>
+      <Link href={`/c/view/${slug}/post/create`} className={buttonVariants()}>
+        Create Post
+      </Link>
+      {/* Post List */}
+      <PostList posts={communityDetails.posts} session={session} />
     </>
   );
 };
