@@ -41,7 +41,12 @@ const Editor: FC<EditorProps> = ({ editorRef }) => {
         },
         embed: Embed,
         table: Table,
-        link: Link,
+        link: {
+          class: Link,
+          config: {
+            endpoint: "/api/editorjs/link",
+          },
+        },
         list: {
           class: List,
           inlineToolbar: true,

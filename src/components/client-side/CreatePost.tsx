@@ -15,7 +15,8 @@ export const CreatePost = () => {
       .catch((e) => console.log(e));
   };
   const getMeta = async () => {
-    const resp = await axios.get("/api/editorjs/link");
+    const resp = await axios.get<any>("/api/editorjs/link");
+    console.log(resp.data);
   };
   return (
     <>
