@@ -1,22 +1,7 @@
-import EditorJS, { OutputData } from "@editorjs/editorjs";
-import Embed from "@editorjs/embed";
-import Header from "@editorjs/header";
-import Image from "@editorjs/image";
-import InlineCode from "@editorjs/inline-code";
-import Code from "@editorjs/code";
-import Link from "@editorjs/link";
-import List from "@editorjs/list";
-import Table from "@editorjs/table";
+import { uploadFiles } from "@/lib/uploadthing";
+import EditorJS from "@editorjs/editorjs";
 
-import {
-  FC,
-  MutableRefObject,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import { Button } from "./Button";
+import { FC, MutableRefObject, useCallback, useEffect } from "react";
 
 // import "@/styles/globals.css";
 
@@ -30,30 +15,60 @@ const Editor: FC<EditorProps> = ({ editorRef }) => {
   // const editorRef = useRef<{ editor: EditorJS }>();
 
   // memoized the intialization func for the editor
-  const initializeEditor = useCallback(() => {
+  const initializeEditor = useCallback(async () => {
     const editor = new EditorJS({
       holder: "editorjs",
       placeholder: "Post your content here>>>",
       tools: {
         header: {
-          class: Header,
+          // dynamic import instead of using -> {import HeaderTool from "@editorjs/header";} (at the top of the module)
+          class: (await import("@editorjs/header")).default,
           inlineToolbar: true,
         },
-        embed: Embed,
-        table: Table,
+        embed: (await import("@editorjs/embed")).default,
+        table: (await import("@editorjs/table")).default,
         link: {
-          class: Link,
+          class: await import("@editorjs/link"),
           config: {
             endpoint: "/api/editorjs/link",
           },
         },
         list: {
-          class: List,
+          class: (await import("@editorjs/list")).default,
           inlineToolbar: true,
         },
-        image: Image,
-        // inlineCode: InlineCode,
-        code: Code,
+        image: {
+          class: (await import("@editorjs/image")).default,
+          config: {
+            uploader: {
+              async uploadByFile(file: File) {
+                try {
+                  const files: File[] = [file];
+                  // console.log("this is file", file);
+                  // returns an array of response object for each upload in the form of a promise, so we destructure the array and just take the first one as we are only uploading 1 file
+                  const [res] = await uploadFiles(files, "imageUploader");
+                  if (res) {
+                    // returning an object in the format acceptable by the image tool to render the image
+                    return {
+                      success: 1,
+                      file: {
+                        url: res.fileUrl,
+                      },
+                    };
+                  }
+                } catch (err) {
+                  console.error("Error uploading file to Uploadthing Server");
+                  return {
+                    success: 0,
+                    file: {},
+                  };
+                }
+              },
+            },
+          },
+        },
+        inlineCode: (await import("@editorjs/inline-code")).default,
+        code: (await import("@editorjs/code")).default,
       },
       autofocus: true,
       inlineToolbar: true,

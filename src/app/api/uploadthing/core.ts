@@ -1,3 +1,4 @@
+import { getToken } from "next-auth/jwt";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 
 const f = createUploadthing();
@@ -11,23 +12,22 @@ export const ourFileRouter = {
     // Set permissions and file types for this FileRoute
     .middleware(async (req) => {
       // This code runs on your server before upload
-      const user = await auth(req);
+      const user = await getToken({ req });
+      // const user = auth(req); // fake
 
       // If you throw, the user will not be able to upload
-      if (!user) throw new Error("Unauthorized");
+      if (!user) throw new Error("Unauthorized - Access Denied");
 
       // Whatever is returned here is accessible in onUploadComplete as `metadata`
       return { userId: user.id };
     })
     // #Param_Note: Check again with the Promise<any>
-    .onUploadComplete(async ({ metadata, file }): Promise<any> => {
+    .onUploadComplete(async ({ metadata, file }) => {
       // This code RUNS ON YOUR SERVER after upload
       console.log("Upload complete for userId:", metadata.userId);
-
       console.log("file url", file.url);
-
       // !!! Whatever is returned here is sent to the clientside `onClientUploadComplete` callback
-      return { uploadedBy: metadata.userId };
+      // return { uploadedBy: metadata.userId };
     }),
 } satisfies FileRouter;
 
