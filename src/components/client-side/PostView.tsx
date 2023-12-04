@@ -1,14 +1,15 @@
-"use client";
 import { Post } from "@prisma/client";
 import { FC } from "react";
 import EditorOutput from "../custom/EditorOutput";
-import PostVote from "./PostVote";
+import PostVote from "./PostVoteClient";
+import { db } from "@/lib/db";
 
 interface PostViewProps {
   post: Post;
 }
 
-const PostView: FC<PostViewProps> = ({ post }) => {
+const PostView = async ({ post }: PostViewProps) => {
+  // #REMOVE
   // const outputData: string = JSON.stringify({
   //   time: 1701546313591,
   //   blocks: [
@@ -75,15 +76,24 @@ const PostView: FC<PostViewProps> = ({ post }) => {
   //   ],
   //   version: "2.27.0",
   // });
+  const postVote = await db.post.findUnique({
+    where: {
+      id: post.id,
+    },
+    select: {
+      votes: true,
+    },
+  });
 
   return (
     // Side buttons for voting
     <>
       <div className="flex items-center gap-0.5">
-        <div className="flex grow-0 flex-col gap-1.5">
-          <PostVote />
+        <div className="flex grow-0 flex-col items-center justify-center gap-1.5">
+          <PostVote votes={postVote?.votes} postId={post.id} />
         </div>
         <div className="flex grow flex-col gap-0">
+          {/* Post body */}
           <div className="flex max-h-[270px] flex-col gap-3 overflow-hidden rounded-md bg-white/10 p-6">
             <div className="flex justify-between gap-2">
               <h2 className="text-2xl font-semibold">{post.title}</h2>

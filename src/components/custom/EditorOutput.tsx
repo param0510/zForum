@@ -1,13 +1,14 @@
+"use client"; // required as 'editorjs-react-render' doesn't support ssr
 import Output, { CodeBoxOutput, LinkToolOutput } from "editorjs-react-renderer";
 
 // import dynamic from "next/dynamic";
-
 // Making a dynamic import for Editorjs react renderer
-// const Output = dynamic(async () => (
-//     (await import('editorjs-react-renderer')).default
-// ), {
-//     ssr: false
-// })
+// const Output = dynamic(
+//   async () => (await import("editorjs-react-renderer")).default,
+//   {
+//     ssr: false,
+//   },
+// );
 
 import { FC } from "react";
 import CustomImageRenderer from "../renderers/CustomImageRenderer";

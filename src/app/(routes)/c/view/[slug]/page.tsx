@@ -21,21 +21,21 @@ const CommunityViewPage = async ({
     select: {
       posts: true,
       subscribers: true,
+      creatorId: true,
     },
   });
   if (!communityDetails) {
     return notFound();
   }
+
   const isUserSubscribed = !!communityDetails.subscribers.find(
     (sub) => sub.userId === session?.user.id,
   );
-
-  // console.log(communityDetails);
-  // get user subscription status
+  const isUserCreator = communityDetails.creatorId === session?.user.id;
   return (
     <>
       <h1 className="mb-6 text-5xl">{slug}</h1>
-      {isUserSubscribed && (
+      {(isUserSubscribed || isUserCreator) && (
         <Link href={`/c/view/${slug}/post/create`} className={buttonVariants()}>
           Create Post
         </Link>

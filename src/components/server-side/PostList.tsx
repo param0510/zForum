@@ -31,6 +31,7 @@ const PostList: FC<PostListProps> = ({ posts }) => {
       <div className="flex flex-col gap-5">
         {posts?.map((post) => (
           <div className="" key={post.id}>
+            {/* @ts-expect-error ssr component */}
             <PostView post={post} />
           </div>
         ))}
