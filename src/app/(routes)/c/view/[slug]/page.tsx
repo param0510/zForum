@@ -1,6 +1,4 @@
-import { CreatePost } from "@/components/client-side/CreatePost";
 import { buttonVariants } from "@/components/custom/Button";
-import CommunityDetails from "@/components/server-side/CommunityDetails";
 import PostList from "@/components/server-side/PostList";
 import { getServerAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
@@ -20,21 +18,28 @@ const CommunityViewPage = async ({
     where: {
       name: slug,
     },
-    include: {
+    select: {
       posts: true,
+      subscribers: true,
     },
   });
   if (!communityDetails) {
     return notFound();
   }
-  // console.log(communityDetails);
+  const isUserSubscribed = !!communityDetails.subscribers.find(
+    (sub) => sub.userId === session?.user.id,
+  );
 
+  // console.log(communityDetails);
+  // get user subscription status
   return (
     <>
       <h1 className="mb-6 text-5xl">{slug}</h1>
-      <Link href={`/c/view/${slug}/post/create`} className={buttonVariants()}>
-        Create Post
-      </Link>
+      {isUserSubscribed && (
+        <Link href={`/c/view/${slug}/post/create`} className={buttonVariants()}>
+          Create Post
+        </Link>
+      )}
       {/* Post List */}
       <PostList posts={communityDetails.posts} session={session} />
     </>

@@ -18,6 +18,7 @@ const CreatePostPage = async ({ params: { slug } }: CreatePostPageProps) => {
     },
     select: {
       id: true,
+      creatorId: true,
     },
   });
   if (!communityObj) {
@@ -35,7 +36,11 @@ const CreatePostPage = async ({ params: { slug } }: CreatePostPageProps) => {
         <strong className="font-semibold">Create Post</strong>{" "}
         <span className="text-xs">in r/TestCommunity</span>
       </h3>
-      <CreatePost />
+      <CreatePost
+        communityId={communityObj.id}
+        communityName={slug}
+        creatorId={communityObj.creatorId}
+      />
     </>
   );
 };

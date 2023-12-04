@@ -1,4 +1,5 @@
 import { getToken } from "next-auth/jwt";
+import { redirect, useRouter } from "next/navigation";
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 
 const f = createUploadthing();
@@ -16,7 +17,12 @@ export const ourFileRouter = {
       // const user = auth(req); // fake
 
       // If you throw, the user will not be able to upload
-      if (!user) throw new Error("Unauthorized - Access Denied");
+      if (!user) {
+        // res
+        throw new Error("Unauthorized - Access Denied", {
+          cause: 401,
+        });
+      }
 
       // Whatever is returned here is accessible in onUploadComplete as `metadata`
       return { userId: user.id };

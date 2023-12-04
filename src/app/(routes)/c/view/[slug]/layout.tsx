@@ -33,7 +33,7 @@ const CommunityViewLayout = async ({
         {/* @ts-expect-error Server Side Async component */}
         <CommunityDetails
           community={{ ...communityDetails }}
-          session={session}
+          // session={session}
         />
       </div>
     </>

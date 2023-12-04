@@ -10,6 +10,7 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@bomdi/codebox": "^2.0.0",
     "@editorjs/code": "^2.8.0",
     "@editorjs/editorjs": "^2.27.0",
     "@editorjs/embed": "^2.5.3",
@@ -70,6 +71,7 @@
     "zod": "^3.21.4"
   },
   "devDependencies": {
+    "@types/bomdi__codebox": "^2.0.0",
     "@types/editorjs__header": "^2.6.0",
     "@types/lodash.debounce": "^4.0.7",
     "@types/open-graph": "^0.2.5",
