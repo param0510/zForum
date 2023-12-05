@@ -1,14 +1,16 @@
 import { Post } from "@prisma/client";
 import { FC } from "react";
 import EditorOutput from "../custom/EditorOutput";
-import PostVote from "./PostVoteClient";
+import PostVoteClient from "./PostVoteClient";
 import { db } from "@/lib/db";
+import Link from "next/link";
 
 interface PostViewProps {
   post: Post;
+  communityNameSlug: string;
 }
 
-const PostView = async ({ post }: PostViewProps) => {
+const PostView = async ({ post, communityNameSlug }: PostViewProps) => {
   // #REMOVE
   // const outputData: string = JSON.stringify({
   //   time: 1701546313591,
@@ -76,6 +78,8 @@ const PostView = async ({ post }: PostViewProps) => {
   //   ],
   //   version: "2.27.0",
   // });
+
+  //  #REMOVE NO NEED for this remove as we would load the votes in client side
   const postVote = await db.post.findUnique({
     where: {
       id: post.id,
@@ -90,9 +94,12 @@ const PostView = async ({ post }: PostViewProps) => {
     <>
       <div className="flex items-center gap-0.5">
         <div className="flex grow-0 flex-col items-center justify-center gap-1.5">
-          <PostVote votes={postVote?.votes} postId={post.id} />
+          <PostVoteClient votes={postVote?.votes} postId={post.id} />
         </div>
-        <div className="flex grow flex-col gap-0">
+        <Link
+          href={`c/view/${communityNameSlug}/post/view?info=${post.id}`}
+          className="flex grow flex-col gap-0"
+        >
           {/* Post body */}
           <div className="flex max-h-[270px] flex-col gap-3 overflow-hidden rounded-md bg-white/10 p-6">
             <div className="flex justify-between gap-2">
@@ -110,7 +117,7 @@ const PostView = async ({ post }: PostViewProps) => {
           <div className="rounded-sm bg-red-400/60">
             Comment buttons displayed here
           </div>
-        </div>
+        </Link>
       </div>
     </>
   );

@@ -16,7 +16,7 @@ export async function POST(req: Request) {
     });
   }
   try {
-    const { title, communityId, content, creatorId } =
+    const { title, communityId, content, communityCreatorId } =
       CreatePostPayloadSchema.parse(reqData);
 
     // counting the existence of the signed in user as a subscriber
@@ -32,7 +32,10 @@ export async function POST(req: Request) {
       },
     });
 
-    if (user_subcription_count._all !== 1 && creatorId !== session.user.id) {
+    if (
+      user_subcription_count._all !== 1 &&
+      communityCreatorId !== session.user.id
+    ) {
       return new Response(
         "User must be subscribed to the community to make a post",
         { status: 403 },

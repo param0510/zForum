@@ -9,7 +9,7 @@ import { useSession } from "next-auth/react";
 import { FC, useEffect, useState } from "react";
 
 interface PostVoteClientProps {
-  votes?: PostVote[];
+  votes?: PostVote[]; // DONT get votes from the parent fetch it in here (make a choice between useEffect or useQuery)
   postId: string;
 }
 const PostVoteClient: FC<PostVoteClientProps> = ({ votes, postId }) => {

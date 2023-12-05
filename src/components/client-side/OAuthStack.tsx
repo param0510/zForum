@@ -1,18 +1,19 @@
 "use client";
 
 import { signIn } from "next-auth/react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import { Button } from "../custom/Button";
 import { Icons } from "../custom/Icons";
 
 const OAuthStack = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
+  const router = useRouter();
   const oAuthSignIn = async () => {
     setIsLoading(true);
     try {
-      await signIn("google", { callbackUrl: `${window.location.origin}` });
+      await signIn("google");
+      router.back();
     } catch (err) {
       console.log(err);
     } finally {

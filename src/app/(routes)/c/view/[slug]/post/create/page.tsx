@@ -39,7 +39,7 @@ const CreatePostPage = async ({ params: { slug } }: CreatePostPageProps) => {
       <CreatePost
         communityId={communityObj.id}
         communityName={slug}
-        creatorId={communityObj.creatorId}
+        communityCreatorId={communityObj.creatorId}
       />
     </>
   );

@@ -41,7 +41,7 @@ const CommunityViewPage = async ({
         </Link>
       )}
       {/* Post List */}
-      <PostList posts={communityDetails.posts} session={session} />
+      <PostList posts={communityDetails.posts} session={session} slug={slug} />
     </>
   );
 };

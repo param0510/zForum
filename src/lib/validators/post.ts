@@ -8,14 +8,14 @@ export const CreatePostPayloadSchema = z.object({
     version: z.string(),
     blocks: z.array(z.any()).nonempty("Content is required to make a post"),
   }),
-  communityId: z.string(),
-  creatorId: z.string(),
+  communityId: z.string().nonempty(),
+  communityCreatorId: z.string().nonempty(),
 });
 
 export type CreatePostPayload = z.infer<typeof CreatePostPayloadSchema>;
 
 export const GetPostsPayloadSchema = z.object({
-  communityId: z.union([z.string(), z.undefined()]),
+  communityId: z.union([z.string().nonempty(), z.undefined()]),
 });
 
 export type GetPostsPayload = z.infer<typeof GetPostsPayloadSchema>;

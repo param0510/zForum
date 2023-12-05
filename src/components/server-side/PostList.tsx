@@ -4,14 +4,15 @@ import { FC } from "react";
 import PostView from "../client-side/PostView";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
+import Link from "next/link";
 
 interface PostListProps {
   posts: Post[];
-  // communityId?: string;
+  slug: string;
   session: Session | null;
 }
 
-const PostList: FC<PostListProps> = ({ posts }) => {
+const PostList: FC<PostListProps> = ({ posts, slug }) => {
   // const { isLoading, data: posts } = useQuery<Post[]>({
   //   queryKey: [communityId, "posts"],
   //   queryFn: async () => {
@@ -30,10 +31,8 @@ const PostList: FC<PostListProps> = ({ posts }) => {
     <div>
       <div className="flex flex-col gap-5">
         {posts?.map((post) => (
-          <div className="" key={post.id}>
-            {/* @ts-expect-error ssr component */}
-            <PostView post={post} />
-          </div>
+          // @ts-expect-error ssr component
+          <PostView post={post} communityNameSlug={slug} key={post.id} />
         ))}
       </div>
     </div>

@@ -22,13 +22,13 @@ interface FormData {
 interface CreatePostProps {
   communityId: string;
   communityName: string;
-  creatorId: string;
+  communityCreatorId: string;
 }
 
 export const CreatePost: FC<CreatePostProps> = ({
   communityId,
   communityName,
-  creatorId,
+  communityCreatorId,
 }) => {
   const editorRef = useRef<{ editor: EditorJS }>();
   const router = useRouter();
@@ -59,7 +59,7 @@ export const CreatePost: FC<CreatePostProps> = ({
         title: getFormValues("title"),
         content: await getEditorData(),
         communityId,
-        creatorId,
+        communityCreatorId,
       };
       const payload = CreatePostPayloadSchema.parse(data);
       const response = await axios.post<Post>("/api/post", payload);
