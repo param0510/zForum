@@ -34,6 +34,7 @@ const CommentList = async ({ postId }: CommentListProps) => {
   return (
     <div>
       {comments.map((comment) => (
+        // @ts-expect-error server side component
         <CommentView
           key={comment.id}
           comment={comment}

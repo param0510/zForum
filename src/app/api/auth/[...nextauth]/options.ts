@@ -32,8 +32,12 @@ export const authOptions: NextAuthOptions = {
     // is run after authentication and whenever a new user is created in database on signup
     // handles the user data before getting passed onto the session callback below as a token
     // Returns => token: JWT
-    async jwt({ token, user }) {
-      // console.log("jwtProps", jwtProps);
+    async jwt({ token, user, session, trigger }) {
+      // this updates the jwt token while the session is active useful for user customization using the client UI
+      if (trigger === "update") {
+        return { ...token, ...session.user };
+      }
+
       // user object only exists when signin event occurs, after this during getServerSession() or useSession() calls only token exists and (user = null)
       if (user) {
         // Initial setup when the user logs in

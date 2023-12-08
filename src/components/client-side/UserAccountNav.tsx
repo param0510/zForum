@@ -10,9 +10,9 @@ import {
 } from "@/components/shadcn-ui/DropdownMenu";
 import { Session } from "next-auth";
 import { signOut } from "next-auth/react";
+import Link from "next/link";
 import { FC } from "react";
 import UserAvatar from "../custom/UserAvatar";
-import Link from "next/link";
 
 // props
 interface UserAccountNavProps {
@@ -20,7 +20,7 @@ interface UserAccountNavProps {
 }
 
 const UserAccountNav: FC<UserAccountNavProps> = ({ session }) => {
-  // console.log("session", session);
+  // const router = useRouter();
 
   return (
     <DropdownMenu>
@@ -36,13 +36,16 @@ const UserAccountNav: FC<UserAccountNavProps> = ({ session }) => {
         <DropdownMenuItem asChild>
           <Link href="/c/create">Create Community</Link>
         </DropdownMenuItem>
-        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href={"/settings"}>Settings</Link>
+        </DropdownMenuItem>
         <DropdownMenuItem
           onClick={(e) => {
             e.preventDefault();
             signOut({
               callbackUrl: `${window.location.origin}/sign-in`,
             });
+            // router.refresh();
           }}
           className="cursor-pointer"
         >

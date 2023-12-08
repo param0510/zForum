@@ -1,9 +1,8 @@
-import { Post } from "@prisma/client";
-import { FC } from "react";
-import EditorOutput from "../custom/EditorOutput";
-import PostVoteClient from "./PostVoteClient";
 import { db } from "@/lib/db";
+import { Post } from "@prisma/client";
 import Link from "next/link";
+import EditorOutput from "../custom/EditorOutput";
+import PostVote from "./PostVote";
 
 interface PostViewProps {
   post: Post;
@@ -79,13 +78,9 @@ const PostView = async ({ post, communityNameSlug }: PostViewProps) => {
   //   version: "2.27.0",
   // });
 
-  //  #REMOVE NO NEED for this remove as we would load the votes in client side
-  const postVote = await db.post.findUnique({
+  const postVotes = await db.postVote.findMany({
     where: {
-      id: post.id,
-    },
-    select: {
-      votes: true,
+      postId: post.id,
     },
   });
 
@@ -94,7 +89,7 @@ const PostView = async ({ post, communityNameSlug }: PostViewProps) => {
     <>
       <div className="flex items-center gap-0.5">
         <div className="flex grow-0 flex-col items-center justify-center gap-1.5">
-          <PostVoteClient votes={postVote?.votes} postId={post.id} />
+          <PostVote votes={postVotes} postId={post.id} />
         </div>
         <Link
           href={`c/view/${communityNameSlug}/post/view?info=${post.id}`}

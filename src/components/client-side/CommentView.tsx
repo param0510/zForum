@@ -3,6 +3,8 @@ import { ThumbsDown, ThumbsUp } from "lucide-react";
 import { FC } from "react";
 import UserAvatar from "../custom/UserAvatar";
 import CommentReplyAction from "./CommentReplyAction";
+import CommentVote from "./CommentVote";
+import { db } from "@/lib/db";
 
 interface CommentViewProps {
   comment: Comment & {
@@ -18,7 +20,7 @@ interface CommentViewProps {
   })[];
 }
 
-const CommentView: FC<CommentViewProps> = ({ comment, replies }) => {
+const CommentView = async ({ comment, replies }: CommentViewProps) => {
   const {
     authorId,
     createdAt,
@@ -28,23 +30,25 @@ const CommentView: FC<CommentViewProps> = ({ comment, replies }) => {
     replyToId,
     author: { image },
   } = comment;
+  const votes = await db.commentVote.findMany({
+    where: {
+      commentId: id,
+    },
+  });
   return (
     <div className="flex items-start gap-5 p-3">
       <UserAvatar imgUrl={image ?? ""} className="h-9 w-9" />
-      <div className="flex w-full flex-col gap-3">
+      <div className="flex w-full flex-col gap-2">
         <div className="flex gap-2 text-sm">
           <span>u/{authorId}</span>
           <span>|</span>
           <span>{createdAt.getHours()} - hours ago</span>
         </div>
         <p>{text}</p>
-        <div className="flex w-full items-center gap-10">
-          {/* Refractor */}
+        <div className="flex w-full items-center gap-5">
           {/* Vote Buttons */}
-          <div className="flex items-center gap-3">
-            <ThumbsUp size={18} className="cursor-pointer" />
-            <span className="">0</span>
-            <ThumbsDown size={18} className="cursor-pointer" />
+          <div className="flex scale-75 items-center justify-center gap-4">
+            <CommentVote commentId={id} votes={votes} />
           </div>
 
           {/* (replyToId ?? id) makes sure that a replyToId is sent to the create comment box */}
@@ -52,6 +56,7 @@ const CommentView: FC<CommentViewProps> = ({ comment, replies }) => {
           <CommentReplyAction postId={postId} replyToId={replyToId ?? id} />
         </div>
         {replies?.map((reply) => (
+          // @ts-expect-error server side component
           <CommentView comment={reply} key={reply.id} />
         ))}
       </div>

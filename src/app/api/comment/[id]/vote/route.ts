@@ -5,9 +5,9 @@ import { ZodError } from "zod";
 
 export async function PATCH(
   req: Request,
-  routeParams: { params: { postId: string } },
+  routeParams: { params: { id: string } },
 ) {
-  const postId = routeParams.params.postId;
+  const commentId = routeParams.params.id;
   const session = await getServerAuthSession();
   const payload = await req.json();
   if (!session?.user) {
@@ -15,11 +15,11 @@ export async function PATCH(
   }
   try {
     const { voteType } = VotePayloadSchema.parse(payload);
-    const existingVote = await db.postVote.findUnique({
+    const existingVote = await db.commentVote.findUnique({
       where: {
-        userId_postId: {
+        userId_commentId: {
           userId: session.user.id,
-          postId,
+          commentId,
         },
       },
       select: {
@@ -29,23 +29,23 @@ export async function PATCH(
 
     // if the user has already voted with the same VoteType remove the record
     if (existingVote?.type === voteType) {
-      const deletedVote = await db.postVote.delete({
+      const deletedVote = await db.commentVote.delete({
         where: {
-          userId_postId: {
+          userId_commentId: {
             userId: session.user.id,
-            postId,
+            commentId,
           },
         },
       });
 
-      return new Response("Post vote removed successfully", { status: 204 });
+      return new Response("Comment vote removed successfully", { status: 204 });
     }
     // if the same vote type doesn't exist in the record just upsert (create/update) the new value
-    const upsertedVote = await db.postVote.upsert({
+    const upsertedVote = await db.commentVote.upsert({
       where: {
-        userId_postId: {
+        userId_commentId: {
           userId: session.user.id,
-          postId,
+          commentId,
         },
       },
       update: {
@@ -53,12 +53,12 @@ export async function PATCH(
       },
       create: {
         userId: session.user.id,
-        postId,
+        commentId,
         type: voteType,
       },
     });
     return new Response(
-      `Post vote updated successfully ${JSON.stringify(upsertedVote)}`,
+      `Comment vote updated successfully ${JSON.stringify(upsertedVote)}`,
       { status: 200 },
     );
   } catch (error) {
