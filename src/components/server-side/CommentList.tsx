@@ -1,46 +1,53 @@
-import { db } from "@/lib/db";
+"use client";
+import { Loader2 } from "lucide-react";
 import CommentView from "../client-side/CommentView";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import axios from "axios";
+import { CommentData } from "@/types/comment";
+import { Button } from "../custom/Button";
 
 interface CommentListProps {
   postId: string;
+  replyToId?: string; // this helps us loop over the list of comments in order to get the replies
 }
 
-const CommentList = async ({ postId }: CommentListProps) => {
-  const comments = await db.comment.findMany({
-    where: {
-      postId,
-      AND: {
-        replyToId: null,
+const CommentList = ({ postId, replyToId }: CommentListProps) => {
+  const { isFetching, data, error, hasNextPage, fetchNextPage } =
+    useInfiniteQuery({
+      queryKey: ["comments", { postId, replyToId }],
+      queryFn: async ({ pageParam = 1 }) => {
+        const reqUrl = replyToId
+          ? `/api/post/${postId}/comment?replyToId=${replyToId}&page=${pageParam}`
+          : `/api/post/${postId}/comment?page=${pageParam}`;
+        const res = await axios.get<CommentData[]>(reqUrl);
+        return res.data;
       },
-    },
-    include: {
-      author: {
-        select: {
-          image: true,
-        },
+      refetchOnWindowFocus: false,
+      getNextPageParam: (lastPage, allPages) => {
+        return lastPage.length ? allPages.length + 1 : undefined;
       },
-      replies: {
-        include: {
-          author: {
-            select: {
-              image: true,
-            },
-          },
-        },
-      },
-    },
-  });
-  //   const {} = comments[0];
+    });
+
+  // console.log("outside data", data);
+  const content = data?.pages.flat().map((comment) => (
+    <CommentView
+      key={comment.id}
+      comment={comment}
+      // replies={comment.replies}
+    />
+  ));
+
   return (
     <div>
-      {comments.map((comment) => (
-        // @ts-expect-error server side component
-        <CommentView
-          key={comment.id}
-          comment={comment}
-          replies={comment.replies}
-        />
-      ))}
+      {content}
+      {isFetching && <Loader2 className="mx-auto mt-5 animate-spin" />}
+      {hasNextPage && !isFetching && (
+        <div className="flex w-full justify-center">
+          <Button onClick={() => fetchNextPage()} className="mx-auto w-fit">
+            Load more
+          </Button>
+        </div>
+      )}
     </div>
   );
 };

@@ -12,19 +12,13 @@ interface PostViewProps {
 
 const PostView = ({ post, communityNameSlug, innerRef }: PostViewProps) => {
   // #UPDATE: this will not work - client component
-  // const postVotes = await db.postVote.findMany({
-  //   where: {
-  //     postId: post.id,
-  //   },
-  // });
-  const postVotes: PV[] = [];
 
   return (
     // Side buttons for voting
     <>
       <div className="flex items-center gap-0.5" ref={innerRef}>
         <div className="flex grow-0 flex-col items-center justify-center gap-1.5">
-          <PostVote votes={postVotes} postId={post.id} />
+          <PostVote postId={post.id} />
         </div>
         <Link
           href={`c/view/${communityNameSlug}/post/view?info=${post.id}`}

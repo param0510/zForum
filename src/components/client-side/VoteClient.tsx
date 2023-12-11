@@ -125,18 +125,9 @@ const VoteClient: FC<VoteClientProps> = ({
 
   // Initial render setup
   useEffect(() => {
-    // if (!session) {
-    //   return;
-    // }
-    // const currentUserVote = votes.find((v) => v.userId === session.user.id);
-    // console.log("votes", votes);
-    // console.log("currentUserVote", currentUserVote);
-    // console.log("session", session);
-
-    // if (currentUserVote?.type) {
     setActiveVoteType(currentUserVoteType);
-    // }
-  }, [currentUserVoteType]);
+    setVoteCount(totalVoteEffect);
+  }, [currentUserVoteType, totalVoteEffect]);
 
   return (
     <>

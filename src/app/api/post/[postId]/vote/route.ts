@@ -3,6 +3,23 @@ import { db } from "@/lib/db";
 import { VotePayloadSchema } from "@/lib/validators/vote";
 import { ZodError } from "zod";
 
+export async function GET(
+  req: Request,
+  routeParams: { params: { postId: string } },
+) {
+  try {
+    const postId = routeParams.params.postId;
+    const votes = await db.postVote.findMany({
+      where: {
+        postId,
+      },
+    });
+    return new Response(JSON.stringify(votes), { status: 200 });
+  } catch (error) {
+    return new Response(JSON.stringify(error), { status: 500 });
+  }
+}
+
 export async function PATCH(
   req: Request,
   routeParams: { params: { postId: string } },
@@ -29,7 +46,7 @@ export async function PATCH(
 
     // if the user has already voted with the same VoteType remove the record
     if (existingVote?.type === voteType) {
-      const deletedVote = await db.postVote.delete({
+      await db.postVote.delete({
         where: {
           userId_postId: {
             userId: session.user.id,
@@ -38,7 +55,7 @@ export async function PATCH(
         },
       });
 
-      return new Response("Post vote removed successfully", { status: 204 });
+      return new Response(null, { status: 204 });
     }
     // if the same vote type doesn't exist in the record just upsert (create/update) the new value
     const upsertedVote = await db.postVote.upsert({
