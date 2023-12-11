@@ -22,6 +22,7 @@ const CommunityViewPage = async ({
       posts: true,
       subscribers: true,
       creatorId: true,
+      id: true,
     },
   });
   if (!communityDetails) {
@@ -41,7 +42,12 @@ const CommunityViewPage = async ({
         </Link>
       )}
       {/* Post List */}
-      <PostList posts={communityDetails.posts} session={session} slug={slug} />
+      <PostList
+        posts={communityDetails.posts}
+        communityId={communityDetails.id}
+        session={session}
+        slug={slug}
+      />
     </>
   );
 };

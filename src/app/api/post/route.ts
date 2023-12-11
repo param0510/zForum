@@ -4,6 +4,7 @@ import {
   CreatePostPayloadSchema,
   GetPostsPayloadSchema,
 } from "@/lib/validators/post";
+import { NextRequest } from "next/server";
 import { ZodError } from "zod";
 
 export async function POST(req: Request) {
@@ -67,27 +68,44 @@ export async function POST(req: Request) {
   }
 }
 
-export async function GET(req: Request) {
-  try {
-    const data = await req.json();
-    const { communityId } = GetPostsPayloadSchema.parse(data);
-    if (communityId) {
-      const communityPosts = await db.post.findMany({
-        where: {
-          communityId,
-        },
-      });
-      return new Response(JSON.stringify(communityPosts), {
-        status: 200,
-      });
+export async function GET(req: NextRequest) {
+  const PAGE_ITEMS = 5;
+  // sample url: api/post?c="COMMUNITY_ID"&page="PAGE_NO"
+  const communityId = req.nextUrl.searchParams.get("c");
+  const page = req.nextUrl.searchParams.get("page");
+
+  // default pageNo = 1
+  var pageNo = 1;
+  if (page) {
+    const pageInt = parseInt(page);
+    if (isNaN(pageInt) || pageInt <= 0) {
+      return new Response(
+        "Invalid request: page paramter should be positive number greater than 0",
+        { status: 400 },
+      );
     }
-    const allPosts = await db.post.findMany();
-    return new Response(JSON.stringify(allPosts), {
+    pageNo = pageInt;
+  }
+
+  try {
+    // if (communityId) {
+    const posts = await db.post.findMany({
+      where: {
+        communityId: communityId ?? undefined,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip: (pageNo - 1) * PAGE_ITEMS,
+      take: PAGE_ITEMS,
+    });
+    return new Response(JSON.stringify(posts), {
       status: 200,
     });
+    // }
   } catch (error) {
     if (error instanceof ZodError) {
-      return new Response(JSON.stringify(error), {
+      return new Response(error.message, {
         status: 400,
       });
     }

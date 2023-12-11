@@ -1,39 +1,93 @@
+"use client";
 import { Post } from "@prisma/client";
-import { Session } from "next-auth";
-import { FC } from "react";
-import PostView from "../client-side/PostView";
-import { useQuery } from "@tanstack/react-query";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
-import Link from "next/link";
+import { Loader2 } from "lucide-react";
+import { Session } from "next-auth";
+import { FC, useCallback, useEffect, useRef, useState } from "react";
+import PostView from "../client-side/PostView";
+import { Button } from "../custom/Button";
 
 interface PostListProps {
   posts: Post[];
-  slug: string;
   session: Session | null;
+
+  slug: string;
+  communityId?: string;
 }
 
-const PostList: FC<PostListProps> = ({ posts, slug }) => {
-  // const { isLoading, data: posts } = useQuery<Post[]>({
-  //   queryKey: [communityId, "posts"],
-  //   queryFn: async () => {
-  //     try {
-  //       const { data } = await axios.get<Post[]>("/api/post", {
-  //         data: communityId,
-  //       });
-  //       return data;
-  //     } catch (error) {
-  //       console.log(error);
-  //       throw new Error("Error fetching data from the server");
-  //     }
-  //   },
-  // });
+const PostList: FC<PostListProps> = ({ posts, slug, communityId }) => {
+  const { data, hasNextPage, fetchNextPage, error, status, isFetching } =
+    useInfiniteQuery({
+      queryKey: ["posts", { communityId }],
+      queryFn: async ({ pageParam = 1 }) => {
+        const reqUrl = communityId
+          ? `/api/post?c=${communityId}&page=${pageParam}`
+          : `/api/post?page=${pageParam}`;
+        const res = await axios.get(reqUrl);
+        return res.data;
+      },
+      getNextPageParam: (lastPage, allPages) => {
+        return lastPage.length ? allPages.length + 1 : undefined;
+      },
+    });
+
+  // reference to observer instance
+  const observerRef = useRef<{
+    intersectionObserver: IntersectionObserver;
+  }>();
+
+  const lastPostCallback = useCallback((lastPost: HTMLDivElement | null) => {
+    if (!lastPost) {
+      // console.log("element unmount");
+      return;
+    }
+
+    if (!observerRef.current) {
+      observerRef.current = {
+        intersectionObserver: new IntersectionObserver(
+          (enteries) => {
+            const [entry] = enteries;
+            if (entry.isIntersecting) fetchNextPage();
+          },
+          { threshold: 1 },
+        ),
+      };
+    }
+
+    console.log("unobserve works");
+    observerRef.current.intersectionObserver.disconnect();
+
+    console.log("ref applied");
+    observerRef.current.intersectionObserver.observe(lastPost);
+  }, []);
+
+  useEffect(() => {
+    if (!hasNextPage && !isFetching) {
+      console.log("observer disconnected");
+      observerRef.current?.intersectionObserver.disconnect();
+    }
+  }, [hasNextPage]);
+
+  const content = data?.pages.flat().map((post: Post, i) => {
+    if (data.pages.flat().length - 1 === i) {
+      return (
+        <PostView
+          post={post}
+          innerRef={lastPostCallback}
+          communityNameSlug={slug}
+          key={post.id}
+        />
+      );
+    }
+    return <PostView post={post} communityNameSlug={slug} key={post.id} />;
+  });
+
   return (
     <div>
       <div className="flex flex-col gap-5">
-        {posts?.map((post) => (
-          // @ts-expect-error ssr component
-          <PostView post={post} communityNameSlug={slug} key={post.id} />
-        ))}
+        {content}
+        {isFetching && <Loader2 className="mx-auto animate-spin" />}
       </div>
     </div>
   );
