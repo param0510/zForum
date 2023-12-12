@@ -1,6 +1,7 @@
 import { getServerAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { CreateCommunityPayloadSchema } from "@/lib/validators/community";
+import { NextRequest } from "next/server";
 import { ZodError } from "zod";
 
 // Create new community
@@ -55,9 +56,20 @@ export async function POST(req: Request) {
 }
 
 // Get all the communities
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   try {
-    const communities = await db.community.findMany();
+    const name = req.nextUrl.searchParams.get("name");
+    const communities = await db.community.findMany({
+      where: {
+        name: {
+          contains: name ?? undefined,
+        },
+      },
+      take: 5, // kept a constant for now - Use it later for pagination
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
     return new Response(JSON.stringify(communities), { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify(error), { status: 500 });
