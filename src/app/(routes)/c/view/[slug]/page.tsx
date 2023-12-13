@@ -1,9 +1,10 @@
 import { buttonVariants } from "@/components/custom/Button";
-import PostList from "@/components/server-side/PostList";
+import PostList from "@/components/client-side/PostList";
 import { getServerAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { INFINITE_SCROLL_PAGINATION_RESULTS } from "@/config";
 
 interface CommunityViewPageProps {
   params: {
@@ -19,35 +20,52 @@ const CommunityViewPage = async ({
       name: slug,
     },
     select: {
-      posts: true,
       subscribers: true,
-      creatorId: true,
+      // creatorId: true,
       id: true,
     },
   });
+
   if (!communityDetails) {
     return notFound();
   }
+  const posts = await db.post.findMany({
+    where: {
+      communityId: communityDetails.id,
+    },
+    include: {
+      community: {
+        select: {
+          name: true,
+        },
+      },
+      author: {
+        select: {
+          username: true,
+        },
+      },
+      comments: true,
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    take: INFINITE_SCROLL_PAGINATION_RESULTS,
+  });
 
   const isUserSubscribed = !!communityDetails.subscribers.find(
     (sub) => sub.userId === session?.user.id,
   );
-  const isUserCreator = communityDetails.creatorId === session?.user.id;
+  // const isUserCreator = communityDetails.creatorId === session?.user.id;
   return (
     <>
       <h1 className="mb-6 text-5xl">{slug}</h1>
-      {(isUserSubscribed || isUserCreator) && (
+      {isUserSubscribed && (
         <Link href={`/c/view/${slug}/post/create`} className={buttonVariants()}>
           Create Post
         </Link>
       )}
       {/* Post List */}
-      <PostList
-        posts={communityDetails.posts}
-        communityId={communityDetails.id}
-        session={session}
-        slug={slug}
-      />
+      <PostList communityId={communityDetails.id} initialPosts={posts} />
     </>
   );
 };

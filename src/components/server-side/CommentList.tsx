@@ -12,9 +12,10 @@ interface CommentListProps {
 }
 
 const CommentList = ({ postId, replyToId }: CommentListProps) => {
-  const { isFetching, data, error, hasNextPage, fetchNextPage } =
+  const { isFetching, data, error, hasNextPage, fetchNextPage, refetch } =
     useInfiniteQuery({
       queryKey: ["comments", { postId, replyToId }],
+      staleTime: 60 * 1000,
       queryFn: async ({ pageParam = 1 }) => {
         const reqUrl = replyToId
           ? `/api/post/${postId}/comment?replyToId=${replyToId}&page=${pageParam}`
@@ -22,7 +23,6 @@ const CommentList = ({ postId, replyToId }: CommentListProps) => {
         const res = await axios.get<CommentData[]>(reqUrl);
         return res.data;
       },
-      refetchOnWindowFocus: false,
       getNextPageParam: (lastPage, allPages) => {
         return lastPage.length ? allPages.length + 1 : undefined;
       },

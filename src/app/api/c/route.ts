@@ -27,15 +27,22 @@ export async function POST(req: Request) {
         status: 409,
       });
     }
-    const { name: createdCommunityName } = await db.community.create({
+    const { name: createdCommunityName, id: communityId } =
+      await db.community.create({
+        data: {
+          // make it type safe
+          name: communityName,
+          creatorId: session.user.id,
+        },
+      });
+    // Addinging subscribers to the created community
+    // creator also has to be subscribed
+    await db.subscription.create({
       data: {
-        // make it type safe
-        name: communityName,
-        creatorId: session.user.id,
+        userId: session.user.id,
+        communityId,
       },
     });
-    // Addinging subscribers to the created community
-    // CHECK THE BREADIT
     return new Response(createdCommunityName, {
       status: 201,
     });

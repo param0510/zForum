@@ -1,29 +1,39 @@
 import { getServerAuthSession } from "@/lib/auth";
 import Link from "next/link";
+import SearchBar from "../client-side/SearchBar";
 import UserAccountNav from "../client-side/UserAccountNav";
 import { buttonVariants } from "../custom/Button";
 import { Icons } from "../custom/Icons";
-import SearchBar from "../client-side/SearchBar";
 
 const Navbar = async () => {
   const session = await getServerAuthSession();
   return (
-    <nav className="flex h-14 w-full items-center justify-between border-b border-b-gray-600/40 bg-slate-400/40 px-4">
-      <Link className="flex gap-2" href="/">
-        <Icons.logo strokeWidth="2" className="stroke-white text-white" />
-        <span>ForumZ</span>
-      </Link>
-      {/* Search Bar */}
-      <SearchBar />
-      {/* Toggle Between Sign-in/sign-up button and user_profile_avatar */}
-      {session ? (
-        /* Avatar */
-        <UserAccountNav session={session} />
-      ) : (
-        <Link href="/sign-in" className={buttonVariants()}>
-          Login
+    <nav className="fixed inset-x-0 top-0 z-[10] h-fit border-b border-zinc-300 bg-zinc-100 py-2">
+      <div className="container mx-auto flex h-full max-w-7xl items-center justify-between gap-2">
+        <Link className="flex items-center gap-2" href="/">
+          <Icons.logo className="h-8 w-8 stroke-black sm:h-6 sm:w-6" />
+          <p className="hidden text-sm font-medium text-zinc-700 md:block">
+            ForumZ
+          </p>
         </Link>
-      )}
+        {/* Search Bar */}
+        <SearchBar />
+        {/* Toggle Between Sign-in/sign-up button and user_profile_avatar */}
+        {session ? (
+          /* Avatar */
+          <UserAccountNav
+            user={{
+              email: session.user.email ?? null,
+              name: session.user.name ?? null,
+              image: session.user.image ?? null,
+            }}
+          />
+        ) : (
+          <Link href="/sign-in" className={buttonVariants()}>
+            Login
+          </Link>
+        )}
+      </div>
     </nav>
   );
 };

@@ -1,3 +1,4 @@
+import { INFINITE_SCROLL_PAGINATION_RESULTS } from "@/config";
 import { getServerAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import {
@@ -68,9 +69,10 @@ export async function POST(req: Request) {
   }
 }
 
+// sample url: api/post?c="COMMUNITY_ID"&page="PAGE_NO"
 export async function GET(req: NextRequest) {
-  const PAGE_ITEMS = 5;
-  // sample url: api/post?c="COMMUNITY_ID"&page="PAGE_NO"
+  const session = await getServerAuthSession();
+  const PAGE_ITEMS = INFINITE_SCROLL_PAGINATION_RESULTS;
   const communityId = req.nextUrl.searchParams.get("c");
   const page = req.nextUrl.searchParams.get("page");
 
@@ -88,10 +90,46 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // if (communityId) {
+    // general feed view data where_condition
+    var whereCondition = {};
+
+    // community post page where_condition
+    if (communityId) {
+      whereCondition = {
+        communityId,
+      };
+    }
+    // if user is logged - Custom feed view data where_condition
+    else if (session?.user) {
+      const followedCommunities = await db.subscription.findMany({
+        where: {
+          userId: session.user.id,
+        },
+        select: {
+          communityId: true,
+        },
+      });
+
+      whereCondition = {
+        communityId: {
+          in: followedCommunities.map(({ communityId }) => communityId),
+        },
+      };
+    }
     const posts = await db.post.findMany({
-      where: {
-        communityId: communityId ?? undefined,
+      where: whereCondition,
+      include: {
+        community: {
+          select: {
+            name: true,
+          },
+        },
+        author: {
+          select: {
+            username: true,
+          },
+        },
+        comments: true,
       },
       orderBy: {
         createdAt: "desc",
@@ -102,7 +140,6 @@ export async function GET(req: NextRequest) {
     return new Response(JSON.stringify(posts), {
       status: 200,
     });
-    // }
   } catch (error) {
     if (error instanceof ZodError) {
       return new Response(error.message, {

@@ -7,7 +7,6 @@ import { CommentData } from "@/types/comment";
 
 interface CommentViewProps {
   comment: CommentData;
-
   // No need for this anymore as we have implemented another way round - look at line 51 to learn more.
   // replies?: (Comment & {
   //   author: {
@@ -28,7 +27,10 @@ const CommentView = ({ comment }: CommentViewProps) => {
   } = comment;
   return (
     <div className="flex items-start gap-5 p-3">
-      <UserAvatar imgUrl={image ?? ""} className="h-9 w-9" />
+      <UserAvatar
+        user={{ name: authorName, image: image }}
+        className="h-9 w-9"
+      />
       <div className="flex w-full flex-col gap-2">
         <div className="flex gap-2 text-sm">
           <span>u/{authorName}</span>

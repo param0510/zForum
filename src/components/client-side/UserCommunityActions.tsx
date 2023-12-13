@@ -61,6 +61,7 @@ const UserCommunityActions: FC<UserCommunityActionsProps> = ({
         } else if (status === 204) {
           setIsUserSubscribed(false);
         }
+        router.refresh();
       },
     });
 

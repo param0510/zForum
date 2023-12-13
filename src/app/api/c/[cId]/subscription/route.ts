@@ -65,7 +65,7 @@ export async function PATCH(
         },
       },
     });
-    return new Response("User subscription removed", { status: 204 });
+    return new Response(null, { status: 204 });
   } catch (error) {
     return new Response("Unable to toggle user subscription, try again later", {
       status: 500,

@@ -33,7 +33,7 @@ const page = async ({ searchParams: { info } }: pageProps) => {
       <div className="flex items-center gap-2">
         <div className="flex shrink flex-col items-center justify-center gap-1.5">
           {/* #REFRACTOR FETCH THE VOTE DATA INSIDE THIS COMPONENT */}
-          <PostVote votes={votes} postId={id} />
+          <PostVote postId={id} />
         </div>
         {/* Post Details */}
         <div className="flex grow flex-col gap-3 rounded-md bg-white/10 p-6">
