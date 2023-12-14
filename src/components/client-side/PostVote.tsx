@@ -1,11 +1,14 @@
 "use client";
-import { voteCounter } from "@/lib/utils";
+import { cn, voteCounter } from "@/lib/utils";
 import { PostVote as PVote, VoteType } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { FC, useEffect, useState } from "react";
 import VoteClient from "./VoteClient";
 import axios from "axios";
-import { Loader2 } from "lucide-react";
+import { ArrowBigDown, ArrowBigUp, Loader2 } from "lucide-react";
+import Animations from "../custom/Animations";
+import { buttonVariants } from "../custom/Button";
+import VoteClientShell from "../custom/VoteClientShell";
 
 interface PostVoteProps {
   postId: string;
@@ -36,14 +39,23 @@ const PostVote: FC<PostVoteProps> = ({ postId }) => {
     };
     getPostVotes();
   }, []);
-  return votes ? (
-    <VoteClient
-      totalVoteEffect={totalVoteEffect}
-      voteUrl={voteUrl}
-      currentUserVoteType={currentUserVoteType}
-    />
-  ) : (
-    <Loader2 className="animate-spin" />
+
+  return (
+    <>
+      {votes ? (
+        <div className="flex flex-col gap-4 pb-4 pr-6 sm:w-20 sm:gap-0 sm:pb-0">
+          <VoteClient
+            totalVoteEffect={totalVoteEffect}
+            voteUrl={voteUrl}
+            currentUserVoteType={currentUserVoteType}
+          />
+        </div>
+      ) : (
+        <div className="flex w-20 flex-col items-center pr-6">
+          <VoteClientShell />
+        </div>
+      )}
+    </>
   );
 };
 

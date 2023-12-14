@@ -10,10 +10,20 @@ export async function PATCH(req: Request) {
   }
   try {
     const reqData = await req.json();
-    const { id, username } = UpdateUserPayloadSchema.parse(reqData);
+    const { username } = UpdateUserPayloadSchema.parse(reqData);
+
+    const usernameExists = await db.user.findFirst({
+      where: {
+        username,
+      },
+    });
+    if (usernameExists) {
+      return new Response("Username already exists", { status: 409 });
+    }
+
     const updateUser = await db.user.update({
       where: {
-        id,
+        id: session.user.id,
       },
       data: {
         username,
@@ -22,7 +32,7 @@ export async function PATCH(req: Request) {
     return new Response(JSON.stringify(updateUser), { status: 200 });
   } catch (error) {
     if (error instanceof ZodError) {
-      return new Response(`Invalid request sent`, { status: 400 });
+      return new Response(error.message, { status: 400 });
     }
     return new Response(`Something went wrong, try again later`, {
       status: 500,

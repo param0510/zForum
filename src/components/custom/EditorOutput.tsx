@@ -6,13 +6,6 @@ import dynamic from "next/dynamic";
 
 // import dynamic from "next/dynamic";
 // Making a dynamic import for Editorjs react renderer
-// const Output = dynamic(
-//   async () => (await import("editorjs-react-renderer")).default,
-//   {
-//     ssr: false,
-//   },
-// );
-
 const Output = dynamic(
   async () => (await import("editorjs-react-renderer")).default,
   { ssr: false },
@@ -36,14 +29,12 @@ const style = {
 
 const EditorOutput: FC<EditorOutputProps> = ({ data }) => {
   return (
-    <div>
-      <Output
-        data={data}
-        style={style}
-        className="text-sm"
-        renderers={customRenderers}
-      />
-    </div>
+    <Output
+      data={data}
+      style={style}
+      className="text-sm"
+      renderers={customRenderers}
+    />
   );
 };
 

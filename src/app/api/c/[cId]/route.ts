@@ -23,16 +23,13 @@ export async function DELETE(
     });
 
     if (session.user.id === communityCreator?.creatorId) {
-      const resp = await db.community.delete({
+      await db.community.delete({
         where: {
           id: communityId,
         },
       });
-      // user is the creator
-      return new Response(
-        `Community deleted successfully: ${JSON.stringify(resp)}`,
-        { status: 200 },
-      );
+      // user is the creator - community succesfully deleted
+      return new Response(null, { status: 204 });
     }
     // the user is not the creator
     return new Response("User must be a creator to delete a community", {

@@ -1,8 +1,11 @@
-import CommunityDetails from "@/components/server-side/CommunityDetails";
+import UserCommunityActions from "@/components/server-side/UserCommunityActions";
+import { buttonVariants } from "@/components/custom/Button";
 import { getServerAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { format } from "date-fns";
+import Link from "next/link";
 import { notFound } from "next/navigation";
-import { FC } from "react";
+import ToFeedButton from "@/components/client-side/ToFeedButton";
 
 interface CommunityViewLayoutProps {
   children: React.ReactNode;
@@ -25,18 +28,68 @@ const CommunityViewLayout = async ({
   if (!communityDetails) {
     return notFound();
   }
+  const memberCount = await db.subscription.count({
+    where: {
+      communityId: communityDetails.id,
+    },
+  });
+
   return (
-    <>
-      <div className="container mx-auto mt-12 flex gap-3 max-lg:flex-col">
-        <div className="flex flex-grow flex-col gap-3">{children}</div>
-        {/* Community Details */}
-        {/* @ts-expect-error Server Side Async component */}
-        <CommunityDetails
-          community={{ ...communityDetails }}
-          session={session}
-        />
+    <div className="mx-auto h-full max-w-7xl pt-12 sm:container">
+      <div>
+        <ToFeedButton />
+
+        <div className="grid grid-cols-1 gap-y-4 py-6 md:grid-cols-3 md:gap-x-4">
+          <ul className="col-span-2 flex flex-col space-y-6">{children}</ul>
+
+          {/* info sidebar */}
+          <div className="order-first h-fit overflow-hidden rounded-lg border border-gray-200 md:order-last">
+            <div className="px-6 py-4">
+              <p className="py-3 font-semibold">
+                About c/{communityDetails.name}
+              </p>
+            </div>
+            <dl className="divide-y divide-gray-100 bg-white px-6 py-4 text-sm leading-6">
+              <div className="flex justify-between gap-x-4 py-3">
+                <dt className="text-gray-500">Created</dt>
+                <dd className="text-gray-700">
+                  <time dateTime={communityDetails.createdAt.toDateString()}>
+                    {format(communityDetails.createdAt, "MMMM d, yyyy")}
+                  </time>
+                </dd>
+              </div>
+              <div className="flex justify-between gap-x-4 py-3">
+                <dt className="text-gray-500">Members</dt>
+                <dd className="flex items-start gap-x-2">
+                  <div className="text-gray-900">{memberCount}</div>
+                </dd>
+              </div>
+              {communityDetails.creatorId === session?.user?.id ? (
+                <div className="flex justify-between gap-x-4 py-3">
+                  <dt className="text-gray-500">You created this community</dt>
+                </div>
+              ) : null}
+              {/*  @ts-expect-error server component */}
+              <UserCommunityActions
+                session={session}
+                creatorId={communityDetails.creatorId}
+                communityId={communityDetails.id}
+                communityName={communityDetails.name}
+              />
+              <Link
+                className={buttonVariants({
+                  variant: "outline",
+                  className: "mb-6 w-full",
+                })}
+                href={`c/view/${slug}/post/create`}
+              >
+                Create Post
+              </Link>
+            </dl>
+          </div>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

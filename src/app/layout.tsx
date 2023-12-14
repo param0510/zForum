@@ -1,4 +1,5 @@
 import Navbar from "@/components/server-side/Navbar";
+import { Toaster } from "@/components/shadcn-ui/Toaster";
 import Providers from "@/context/providers";
 import { cn } from "@/lib/utils";
 import "@/styles/globals.css";
@@ -37,6 +38,7 @@ export default function RootLayout({
           </main>
           <footer></footer>
         </Providers>
+        <Toaster />
       </body>
     </html>
   );

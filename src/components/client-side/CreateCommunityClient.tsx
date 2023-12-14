@@ -5,139 +5,136 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { FC, useEffect, useState } from "react";
+import { FC, useCallback, useEffect, useState } from "react";
 import { ZodError } from "zod";
 import { Button } from "../custom/Button";
+import { useCustomToasts } from "@/hooks/use-custom-toasts";
+import { Input } from "../shadcn-ui/Input";
+import debounce from "lodash.debounce";
+import { toast } from "@/hooks/use-toast";
 
-interface CreateCommunityClientProps {}
+interface CreateCommunityClientProps {
+  existingCommunityNames: string[];
+}
 
-const CreateCommunityClient: FC<CreateCommunityClientProps> = () => {
+const CreateCommunityClient: FC<CreateCommunityClientProps> = ({
+  existingCommunityNames,
+}) => {
   const router = useRouter();
-  const { data: session } = useSession();
   const [input, setInput] = useState<string>("");
-  const [isInputInvalid, setIsInputInvalid] = useState<boolean>(false);
-  // use this to update the cached created communityNames in fetch useQuery
-  const queryClient = useQueryClient();
+  const [nameExists, setNameExists] = useState<boolean>(false);
+  const { loginToast } = useCustomToasts();
 
-  // useQuery Hook definition for fetching already existing names of
-  const { data: existingCommunityNames } = useQuery<string[], Error>({
-    queryKey: ["communityNames"],
-    staleTime: 1000 * 60 * 5, // 5 mins for being fresh
-    queryFn: async () => {
-      // console.log("fetch runs");
-      const { data } = await axios.get<Community[]>("/api/c");
-      return data.map((c) => c.name);
-    },
-  });
-
-  // #Task: move to lib/validators
-  // Community Name Validator to check if the name already exs
-  const communityNameValidator = (): void => {
-    const validity: boolean = input.trim().length
-      ? !!existingCommunityNames?.includes(input)
+  const communityNameValidator = (inputValue: string): void => {
+    const validity: boolean = inputValue.trim().length
+      ? !!existingCommunityNames.includes(inputValue)
       : false;
-    setIsInputInvalid(validity);
+    setNameExists(validity);
   };
+  const debounceFn = useCallback(debounce(communityNameValidator, 200), []);
 
   // Mutation Query to create a new Community
   const { mutate: addCommunity, isLoading } = useMutation<string>({
     mutationFn: async () => {
-      if (!session?.user) {
-        router.push("/sign-in");
-        // trigger sign-in toast here
-        throw new Error("Unauthorized User");
-      }
       // Enforce validity using zod here
       const payload = CreateCommunityPayloadSchema.parse({ name: input });
       const { data } = await axios.post<string>("/api/c", payload);
       return data;
     },
 
-    //#Task: create Toasts for the specific use cases that can be applied.
-    onError: (error: any) => {
-      if (error instanceof AxiosError) {
-        const { message, response } = error;
-        const status = response?.status;
-        // handle the errors with different status codes
-        if (status === 401) {
-          console.log("Unauthorized access:", status, "-", message);
-        } else if (status === 409) {
-          console.log("Data Conflict:", status, "-", message);
-        } else if (status === 422) {
-          console.log("Client Error (invalid payload):", status, "-", message);
-        } else if (status === 500) {
-          console.log("Server timed out error:", status, "-", message);
+    onError: (err) => {
+      if (err instanceof AxiosError) {
+        if (err.response?.status === 409) {
+          return toast({
+            title: "Subreddit already exists.",
+            description: "Please choose a different name.",
+            variant: "destructive",
+          });
         }
-      } else if (error instanceof ZodError) {
-        const { issues } = error;
-        console.log("Client Error (invalid community name):", issues);
-      } else {
-        console.log(error);
+
+        if (err.response?.status === 401) {
+          return loginToast();
+        }
       }
+      if (err instanceof ZodError) {
+        return toast({
+          title: "Invalid subreddit name.",
+          description: "Please choose a name between 3 and 26 letters.",
+          variant: "destructive",
+        });
+      }
+
+      toast({
+        title: "There was an error.",
+        description: "Could not create subreddit.",
+        variant: "destructive",
+      });
     },
     onSuccess(data: string) {
-      console.log("Successfully created community", data);
-      // caching the react-query results for 'communityNames' useQuery above
-      if (existingCommunityNames) {
-        const upatedCommunityNames: string[] = [
-          ...existingCommunityNames,
-          data,
-        ];
-        queryClient.setQueryData<string[]>(
-          ["communityNames"],
-          upatedCommunityNames,
-        );
-      } else {
-        // make the "communityNames" - useQuery invalid/stale. so that it refetches the data with the newly added community
-        // this is done to prevent incorrect manual caching of "communityNames" incase if the database takes time to send the community names and the user already creates a new community.
-        queryClient.invalidateQueries<string[]>(["communityNames"]);
-      }
-      setInput("");
       // redirect to the newly created page or give a toast
       router.push(`/c/view/${data}`);
+      router.refresh();
     },
   });
 
-  // Implement lazy function call over here later. Function which gets called in search bar
-  useEffect(() => {
-    communityNameValidator();
-    // console.log(existingCommunityNames);
-  }, [input]);
-
   return (
-    <>
-      <input
-        autoFocus={true}
-        type="text"
-        className="p-2 text-black"
-        placeholder="c/"
-        value={input}
-        onKeyUp={(e) => {
-          if (e.key === "Enter" && input.trim()) {
-            addCommunity();
-            // console.log("this works:", input);
-          }
-        }}
-        onChange={(e) => setInput(e.target.value)}
-      />
-      {isInputInvalid && (
-        <p className="align-sub text-sm text-red-300">
-          Community name already exists
-        </p>
-      )}
-      <div className="flex gap-2">
-        <Button variant={"subtle"} onClick={() => router.back()}>
-          Cancel
-        </Button>
-        <Button
-          disabled={!!!input.trim() || isInputInvalid}
-          onClick={() => addCommunity()}
-          isLoading={isLoading}
-        >
-          Create
-        </Button>
+    <div className="container mx-auto flex h-full max-w-3xl items-center">
+      <div className="relative h-fit w-full space-y-6 rounded-lg bg-white p-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-xl font-semibold">Create a Community</h1>
+        </div>
+        <hr className="h-px bg-red-500" />
+
+        <div className="flex flex-col gap-1">
+          <p className="text-lg font-medium">Name</p>
+          <p className="pb-2 text-xs">
+            Community names including capitalization cannot be changed.
+          </p>
+          <div className="relative">
+            <p className="absolute inset-y-0 left-0 grid w-8 place-items-center text-sm text-zinc-400">
+              r/
+            </p>
+            <Input
+              autoFocus={true}
+              className="pl-6"
+              value={input}
+              onChange={(e) => {
+                const value = e.target.value;
+                setInput(value);
+                debounceFn(value);
+              }}
+              onKeyUp={(e) => {
+                if (e.key === "Enter" && input.trim() && !nameExists) {
+                  addCommunity();
+                }
+              }}
+            />
+          </div>
+          {nameExists && (
+            <p className="pt-1 align-sub text-xs font-semibold text-red-600">
+              Community name already exists
+            </p>
+          )}
+        </div>
+
+        <div className="flex justify-end gap-4">
+          <Button
+            disabled={isLoading}
+            variant="subtle"
+            onClick={() => router.back()}
+          >
+            Cancel
+          </Button>
+          <Button
+            isLoading={isLoading}
+            disabled={input.trim().length === 0 || nameExists}
+            onClick={() => addCommunity()}
+          >
+            Create Community
+          </Button>
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 

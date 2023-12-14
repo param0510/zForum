@@ -1,31 +1,25 @@
-import { uploadFiles, useUploadThing } from "@/lib/uploadthing";
-import EditorJS from "@editorjs/editorjs";
-
-import { FC, MutableRefObject, useCallback, useEffect } from "react";
-
+import { uploadFiles } from "@/lib/uploadthing";
 import "@/styles/editor.css";
-import { Session } from "next-auth";
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context";
-
-console.log("This is Editor.tsx");
+import EditorJS from "@editorjs/editorjs";
+import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import { FC, MutableRefObject, RefObject, useCallback, useEffect } from "react";
 
 interface EditorProps {
-  // may be use this as a callback to transfer the editorRef back to the parent - Check the master code?
-  // getData: () => OutputData | any | undefined;
   editorRef: MutableRefObject<{ editor: EditorJS } | undefined>;
-  session: Session | null;
-  router: AppRouterInstance;
 }
 
-const Editor: FC<EditorProps> = ({ editorRef, session, router }) => {
-  // const editorRef = useRef<{ editor: EditorJS }>();
+const Editor: FC<EditorProps> = ({ editorRef }) => {
+  const { data: session } = useSession();
 
+  const router = useRouter();
   // memoized the intialization func for the editor
   const initializeEditor = useCallback(async () => {
     // dynamic import instead of using -> {import HeaderTool from "@editorjs/header";} (at the top of the module)
     const HeaderTool = (await import("@editorjs/header")).default;
     const EmbedTool = (await import("@editorjs/embed")).default;
     const CodeBoxTool = (await import("@bomdi/codebox")).default;
+
     const editor = new EditorJS({
       holder: "editorjs",
       placeholder: "Post your content here>>>",
@@ -95,7 +89,7 @@ const Editor: FC<EditorProps> = ({ editorRef, session, router }) => {
           },
         },
       },
-      autofocus: true,
+      // autofocus: true,
       inlineToolbar: true,
       onReady: () => {
         editorRef.current = { editor };
@@ -120,11 +114,7 @@ const Editor: FC<EditorProps> = ({ editorRef, session, router }) => {
 
   return (
     <>
-      <div
-        id="editorjs"
-        // I defined the 'reset-preflight' class inside the tailwind.config.ts -> plugins: []
-        className="reset-preflight-h1:text-3xl min-h-[300px] bg-white/10 text-black placeholder:text-emerald-500 prose-h2:text-2xl"
-      />
+      <div id="editorjs" className="min-h-[500px]" />
     </>
   );
 };

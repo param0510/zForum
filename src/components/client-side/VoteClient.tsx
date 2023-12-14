@@ -1,10 +1,14 @@
 "use client";
-import { PostVote, VoteType } from "@prisma/client";
+import { useCustomToasts } from "@/hooks/use-custom-toasts";
+import { toast } from "@/hooks/use-toast";
+import { usePrevious } from "@mantine/hooks";
+import { VoteType } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
-import { ThumbsDown, ThumbsUp } from "lucide-react";
-import { useRouter } from "next/navigation";
+import axios, { AxiosError } from "axios";
+import { ArrowBigDown, ArrowBigUp, ThumbsDown, ThumbsUp } from "lucide-react";
 import { FC, useEffect, useState } from "react";
+import { Button } from "../custom/Button";
+import { cn } from "@/lib/utils";
 
 interface VoteClientProps {
   totalVoteEffect: number;
@@ -20,106 +24,59 @@ const VoteClient: FC<VoteClientProps> = ({
   const [activeVoteType, setActiveVoteType] = useState<VoteType | undefined>(
     currentUserVoteType,
   );
-  const router = useRouter();
+  const previousVoteType = usePrevious(currentUserVoteType);
+  const { loginToast } = useCustomToasts();
 
   const { mutate: vote, isLoading } = useMutation({
-    mutationFn: async ({
-      voteType,
-      previousVoteType,
-    }: {
-      voteType: VoteType;
-      previousVoteType: VoteType | undefined;
-    }) => {
-      // Check out the best practice to implement this
-      if (previousVoteType === "DOWN") {
-        if (voteType === "UP") {
-          setActiveVoteType("UP");
-          setVoteCount(voteCount + 2);
-        } else {
-          setActiveVoteType(undefined);
-          setVoteCount(voteCount + 1);
-        }
-      } else if (previousVoteType === "UP") {
-        if (voteType === "UP") {
-          setActiveVoteType(undefined);
-          setVoteCount(voteCount - 1);
-        } else {
-          setActiveVoteType("DOWN");
-          setVoteCount(voteCount - 2);
-        }
-      } else if (previousVoteType === undefined) {
-        if (voteType === "UP") {
-          setActiveVoteType("UP");
-          setVoteCount(voteCount + 1);
-        } else {
-          setActiveVoteType("DOWN");
-          setVoteCount(voteCount - 1);
+    onMutate(voteType) {
+      if (activeVoteType === voteType) {
+        // User is voting the same way again, so remove their vote
+        setActiveVoteType(undefined);
+        if (voteType === "UP") setVoteCount((prev) => prev - 1);
+        else if (voteType === "DOWN") setVoteCount((prev) => prev + 1);
+      } else {
+        // User is voting in the opposite direction, so subtract 2
+        setActiveVoteType(voteType);
+        if (voteType === "UP")
+          setVoteCount((prev) => prev + (activeVoteType ? 2 : 1));
+        else if (voteType === "DOWN")
+          setVoteCount((prev) => prev - (activeVoteType ? 2 : 1));
+      }
+    },
+    mutationFn: async (voteType: VoteType) => {
+      return await axios.patch(voteUrl, { voteType });
+    },
+    onError: (err, voteType) => {
+      if (previousVoteType) {
+        if (voteType === "UP")
+          setVoteCount((curr) =>
+            previousVoteType === "UP" ? curr + 1 : curr - 2,
+          );
+        else
+          setVoteCount((curr) =>
+            previousVoteType === "DOWN" ? curr - 1 : curr + 2,
+          );
+      } else {
+        if (voteType === "UP") setVoteCount((prev) => prev - 1);
+        else setVoteCount((prev) => prev + 1);
+      }
+
+      // reset current vote
+      setActiveVoteType(previousVoteType);
+
+      if (err instanceof AxiosError) {
+        if (err.response?.status === 401) {
+          console.log("axios error");
+
+          return loginToast();
         }
       }
-      const res = await axios.patch(voteUrl, { voteType });
-      return res;
-    },
-    onError(error, { voteType, previousVoteType }) {
-      // toast for error message - IMPORTANT
-      // revert back on the state objects
 
-      // NO NEED FOR THIS
-      // if (previousVoteType === "DOWN") {
-      //   if (voteType === "UP") {
-      //     setActiveVoteType("DOWN");
-      //     setVoteCount(voteCount - 2);
-      //   } else {
-      //     setActiveVoteType("DOWN");
-      //     setVoteCount(voteCount - 1);
-      //   }
-      // } else if (previousVoteType === "UP") {
-      //   setActiveVoteType("UP");
-      //   if (voteType === "UP") {
-      //     setVoteCount(voteCount + 1);
-      //   } else {
-      //     setVoteCount(voteCount + 2);
-      //   }
-      // } else if (previousVoteType === undefined) {
-      //   setActiveVoteType(undefined);
-      //   if (voteType === "UP") {
-      //     setVoteCount(voteCount - 1);
-      //   } else {
-      //     setVoteCount(voteCount + 1);
-      //   }
-      // }
-
-      console.log(error);
-    },
-    onSuccess(data, { voteType, previousVoteType }) {
-      // do something
-      // if (activeVoteType === "DOWN") {
-      //   if (voteType === "UP") {
-      //     setActiveVoteType("UP");
-      //     setVoteCount(voteCount + 2);
-      //   } else {
-      //     setActiveVoteType(undefined);
-      //     setVoteCount(voteCount + 1);
-      //   }
-      // } else if (activeVoteType === "UP") {
-      //   if (voteType === "UP") {
-      //     setActiveVoteType(undefined);
-      //     setVoteCount(voteCount - 1);
-      //   } else {
-      //     setActiveVoteType("DOWN");
-      //     setVoteCount(voteCount - 2);
-      //   }
-      // } else if (activeVoteType === undefined) {
-      //   if (voteType === "UP") {
-      //     setActiveVoteType("UP");
-      //     setVoteCount(voteCount + 1);
-      //   } else {
-      //     setActiveVoteType("DOWN");
-      //     setVoteCount(voteCount - 1);
-      //   }
-      // }
-    },
-    onSettled() {
-      router.refresh();
+      return toast({
+        title: "Something went wrong.",
+        description: "Your vote was not registered. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -131,11 +88,49 @@ const VoteClient: FC<VoteClientProps> = ({
 
   return (
     <>
+      {/* upvote */}
+      <Button
+        onClick={() => vote("UP")}
+        size="sm"
+        variant="ghost"
+        aria-label="upvote"
+      >
+        <ArrowBigUp
+          className={cn("h-5 w-5 text-zinc-700", {
+            "fill-emerald-500 text-emerald-500": activeVoteType === "UP",
+          })}
+        />
+      </Button>
+
+      {/* score */}
+      <p className="py-2 text-center text-sm font-medium text-zinc-900">
+        {voteCount}
+      </p>
+
+      {/* downvote */}
+      <Button
+        onClick={() => vote("DOWN")}
+        size="sm"
+        className={cn({
+          "text-emerald-500": activeVoteType === "DOWN",
+        })}
+        variant="ghost"
+        aria-label="downvote"
+      >
+        <ArrowBigDown
+          className={cn("h-5 w-5 text-zinc-700", {
+            "fill-red-500 text-red-500": activeVoteType === "DOWN",
+          })}
+        />
+      </Button>
+    </>
+  );
+
+  return (
+    <>
       <button
         disabled={isLoading}
-        onClick={() =>
-          vote({ voteType: "UP", previousVoteType: activeVoteType })
-        }
+        onClick={() => vote("UP")}
         className="cursor-pointer"
       >
         <ThumbsUp
@@ -146,9 +141,7 @@ const VoteClient: FC<VoteClientProps> = ({
       {voteCount}
       <button
         disabled={isLoading}
-        onClick={() =>
-          vote({ voteType: "DOWN", previousVoteType: activeVoteType })
-        }
+        onClick={() => vote("DOWN")}
         className="cursor-pointer"
       >
         <ThumbsDown

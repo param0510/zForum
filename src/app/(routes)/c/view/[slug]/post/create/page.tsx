@@ -1,5 +1,5 @@
 import { CreatePost } from "@/components/client-side/CreatePost";
-import { buttonVariants } from "@/components/custom/Button";
+import { Button, buttonVariants } from "@/components/custom/Button";
 import { db } from "@/lib/db";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -18,30 +18,29 @@ const CreatePostPage = async ({ params: { slug } }: CreatePostPageProps) => {
     },
     select: {
       id: true,
-      creatorId: true,
     },
   });
   if (!communityObj) {
     return notFound();
   }
+
   return (
-    <>
-      <Link
-        className={cn("w-fit", buttonVariants({ variant: "ghost" }))}
-        href={`/c/view/${slug}`}
-      >
-        {"<"} Back to community
-      </Link>
-      <h3>
-        <strong className="font-semibold">Create Post</strong>{" "}
-        <span className="text-xs">in r/TestCommunity</span>
-      </h3>
-      <CreatePost
-        communityId={communityObj.id}
-        communityName={slug}
-        communityCreatorId={communityObj.creatorId}
-      />
-    </>
+    <div className="flex flex-col items-start gap-6">
+      {/* heading */}
+      <div className="border-b border-gray-200 pb-5">
+        <div className="-ml-2 -mt-2 flex flex-wrap items-baseline">
+          <h3 className="ml-2 mt-2 text-base font-semibold leading-6 text-gray-900">
+            Create Post
+          </h3>
+          <p className="ml-2 mt-1 truncate text-sm text-gray-500">
+            in c/{slug}
+          </p>
+        </div>
+      </div>
+
+      {/* form */}
+      <CreatePost communityId={communityObj.id} communityName={slug} />
+    </div>
   );
 };
 

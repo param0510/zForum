@@ -1,11 +1,10 @@
-import { Post, PostVote as PV } from "@prisma/client";
+import { formatTimeToNow } from "@/lib/utils";
+import { Post } from "@prisma/client";
+import { MessageSquare } from "lucide-react";
 import Link from "next/link";
+import { useRef } from "react";
 import EditorOutput from "../custom/EditorOutput";
 import PostVote from "./PostVote";
-import { Ref, useRef } from "react";
-import { MessageSquare } from "lucide-react";
-import { formatTimeToNow } from "@/lib/utils";
-import { ExtendedPost } from "@/types/post";
 
 interface PostViewProps {
   post: Post & {

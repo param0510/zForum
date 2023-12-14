@@ -1,10 +1,7 @@
 import { INFINITE_SCROLL_PAGINATION_RESULTS } from "@/config";
 import { getServerAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import {
-  CreatePostPayloadSchema,
-  GetPostsPayloadSchema,
-} from "@/lib/validators/post";
+import { CreatePostPayloadSchema } from "@/lib/validators/post";
 import { NextRequest } from "next/server";
 import { ZodError } from "zod";
 
@@ -18,26 +15,20 @@ export async function POST(req: Request) {
     });
   }
   try {
-    const { title, communityId, content, communityCreatorId } =
+    const { title, communityId, content } =
       CreatePostPayloadSchema.parse(reqData);
 
     // counting the existence of the signed in user as a subscriber
-    const user_subcription_count = await db.subscription.count({
-      select: {
-        _all: true,
-      },
+    const isUserSubscribed = await db.subscription.findUnique({
       where: {
-        communityId,
-        AND: {
+        userId_communityId: {
+          communityId,
           userId: session.user.id,
         },
       },
     });
 
-    if (
-      user_subcription_count._all !== 1 &&
-      communityCreatorId !== session.user.id
-    ) {
+    if (!isUserSubscribed) {
       return new Response(
         "User must be subscribed to the community to make a post",
         { status: 403 },

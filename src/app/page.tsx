@@ -30,7 +30,7 @@ export default async function HomePage() {
           <dl className="-my-3 divide-y divide-gray-100 px-6 py-4 text-sm leading-6">
             <div className="flex justify-between gap-x-4 py-3">
               <p className="text-zinc-500">
-                Your personal Breadit frontpage. Come here to check in with your
+                Your personal ForumZ frontpage. Come here to check in with your
                 favorite communities.
               </p>
             </div>
@@ -39,7 +39,7 @@ export default async function HomePage() {
               className={buttonVariants({
                 className: "mb-6 mt-4 w-full",
               })}
-              href={`/r/create`}
+              href={`/c/create`}
             >
               Create Community
             </Link>

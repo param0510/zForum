@@ -144,7 +144,7 @@ const PostList: FC<PostListProps> = ({ communityId, initialPosts }) => {
   // });
 
   return (
-    <ul className="'flex space-y-6' col-span-2 flex-col">
+    <ul className="col-span-2 flex flex-col space-y-6">
       {content}
       {isFetching && (
         <li className="flex justify-center">

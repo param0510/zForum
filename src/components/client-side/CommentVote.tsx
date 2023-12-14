@@ -1,11 +1,12 @@
 "use client";
-import { voteCounter } from "@/lib/utils";
+import { cn, voteCounter } from "@/lib/utils";
 import { CommentVote as CVote, VoteType } from "@prisma/client";
 import { useSession } from "next-auth/react";
 import { FC, useEffect, useState } from "react";
 import VoteClient from "./VoteClient";
 import axios from "axios";
 import { Loader2 } from "lucide-react";
+import Animations from "../custom/Animations";
 
 interface CommentVoteProps {
   commentId: string;
@@ -37,14 +38,18 @@ const CommentVote: FC<CommentVoteProps> = ({ commentId }) => {
     getCommentVotes();
   }, []);
 
-  return votes ? (
-    <VoteClient
-      totalVoteEffect={totalVoteEffect}
-      voteUrl={voteUrl}
-      currentUserVoteType={currentUserVoteType}
-    />
-  ) : (
-    <Loader2 className="animate-spin" />
+  return (
+    <div className={cn("flex gap-1", !votes && "items-center justify-center")}>
+      {votes ? (
+        <VoteClient
+          totalVoteEffect={totalVoteEffect}
+          voteUrl={voteUrl}
+          currentUserVoteType={currentUserVoteType}
+        />
+      ) : (
+        <Animations.spinner className="h-4 w-4" />
+      )}
+    </div>
   );
 };
 
