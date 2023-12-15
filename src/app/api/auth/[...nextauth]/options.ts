@@ -97,10 +97,9 @@ export const authOptions: NextAuthOptions = {
       };
     },
     // Redirect callback function. Called after every sucessful (signin/signout)
-    // async redirect({ url, baseUrl }) {
-    //   // console.log("redirect called:", { url, baseUrl });
-
-    //   return "/";
-    // },
+    async redirect({ url, baseUrl }) {
+      // console.log("redirect called:", { url, baseUrl });
+      return "/";
+    },
   },
 };

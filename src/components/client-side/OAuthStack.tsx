@@ -1,5 +1,6 @@
 "use client";
 
+import { toast } from "@/hooks/use-toast";
 import { signIn } from "next-auth/react";
 import { useState } from "react";
 import { Button } from "../custom/Button";
@@ -7,22 +8,33 @@ import { Icons } from "../custom/Icons";
 
 const OAuthStack = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const oAuthSignIn = async () => {
+  const oAuthSignIn = async (provider: string) => {
     setIsLoading(true);
     try {
-      await signIn("google");
+      await signIn(provider);
     } catch (err) {
-      console.log(err);
+      toast({
+        title: "Error",
+        description: `There was an error logging in with ${provider}`,
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }
   };
   return (
-    <div className="flex flex-col gap-2">
-      <Button className="gap-1.5" isLoading={isLoading} onClick={oAuthSignIn}>
+    <div className="flex flex-col items-center justify-center gap-2">
+      <Button
+        className="w-full"
+        disabled={isLoading}
+        isLoading={isLoading}
+        onClick={() => oAuthSignIn("google")}
+        type="button"
+        size="sm"
+      >
         {/* isLoading is false - It will show the Google Icon */}
-        {isLoading || <Icons.google className="h-[80%]" />}
-        Sign in
+        {isLoading || <Icons.google className="mr-2 h-4 w-4" />}
+        Google
       </Button>
     </div>
   );

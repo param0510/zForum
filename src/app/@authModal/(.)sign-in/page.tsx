@@ -1,22 +1,17 @@
-"use client";
-import OAuthStack from "@/components/client-side/OAuthStack";
-import { X } from "lucide-react";
+import CloseModal from "@/components/client-side/CloseModal";
+import SignIn from "@/components/server-side/SignIn";
 import { useRouter } from "next/navigation";
-import React from "react";
 
 const SignInModal = () => {
-  const router = useRouter();
   return (
-    <div className="fixed inset-0 bg-zinc-900/40 z-10">
-      <div className="container flex items-center h-full max-w-lg mx-auto">
-        <div className="relative bg-emerald-400/40 w-full h-fit py-20 px-2 rounded-lg">
-          <div className="absolute top-4 right-4">
-            <X onClick={router.back} className="cursor-pointer" />
+    <div className="fixed inset-0 z-10 bg-zinc-900/40">
+      <div className="container mx-auto flex h-full max-w-lg items-center">
+        <div className="relative h-fit w-full rounded-lg bg-white px-2 py-20">
+          <div className="absolute right-4 top-4">
+            <CloseModal />
           </div>
 
-          <h3>Welcome</h3>
-          <div>You are agreeing to our terms by continuing.</div>
-          <OAuthStack />
+          <SignIn />
         </div>
       </div>
     </div>

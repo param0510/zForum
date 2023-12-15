@@ -30,7 +30,7 @@ const Navbar = async () => {
           />
         ) : (
           <Link href="/sign-in" className={buttonVariants()}>
-            Login
+            Sign in
           </Link>
         )}
       </div>
