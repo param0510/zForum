@@ -1,10 +1,8 @@
 import MiniCreatePost from "@/components/client-side/MiniCreatePost";
 import PostList from "@/components/client-side/PostList";
-import { buttonVariants } from "@/components/custom/Button";
 import { INFINITE_SCROLL_PAGINATION_RESULTS } from "@/config";
 import { getServerAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
-import Link from "next/link";
 
 interface CommunityViewPageProps {
   params: {
@@ -45,10 +43,6 @@ const CommunityViewPage = async ({
   if (!communityDetails) {
     return;
   }
-
-  // const isUserSubscribed = !!communityDetails.subscribers.find(
-  //   (sub) => sub.userId === session?.user.id,
-  // );
 
   return (
     <>

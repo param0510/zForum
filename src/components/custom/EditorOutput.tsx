@@ -1,18 +1,17 @@
 "use client"; // required as 'editorjs-react-render' doesn't support ssr
-import { CodeBoxOutput, LinkToolOutput } from "editorjs-react-renderer";
+import Output, { CodeBoxOutput, LinkToolOutput } from "editorjs-react-renderer";
+// import { CodeBoxOutput, LinkToolOutput } from "editorjs-react-renderer";
 import { FC } from "react";
 import CustomImageRenderer from "../renderers/CustomImageRenderer";
-import dynamic from "next/dynamic";
-
+import { toast } from "@/hooks/use-toast";
 // import dynamic from "next/dynamic";
-// Making a dynamic import for Editorjs react renderer
-const Output = dynamic(
-  async () => (await import("editorjs-react-renderer")).default,
-  { ssr: false },
-);
 
+// const Output = dynamic(
+//   async () => (await import("editorjs-react-renderer")).default,
+//   { ssr: false },
+// );
 interface EditorOutputProps {
-  data: any;
+  data: string;
 }
 
 const customRenderers = {
@@ -28,14 +27,25 @@ const style = {
 };
 
 const EditorOutput: FC<EditorOutputProps> = ({ data }) => {
-  return (
-    <Output
-      data={data}
-      style={style}
-      className="text-sm"
-      renderers={customRenderers}
-    />
-  );
+  var content = null;
+  try {
+    content = (
+      <Output
+        data={JSON.parse(data)}
+        style={style}
+        className="text-sm"
+        renderers={customRenderers}
+      />
+    );
+  } catch (error) {
+    toast({
+      title: "EdiorJs Oops!",
+      description: "Something went wrong",
+      variant: "destructive",
+    });
+    content = null;
+  }
+  return content;
 };
 
 export default EditorOutput;

@@ -1,13 +1,12 @@
-import EditorOutput from "@/components/custom/EditorOutput";
-import CommentSection from "@/components/server-side/CommentSection";
 import PostVote from "@/components/client-side/PostVote";
+import EditorOutput from "@/components/custom/EditorOutput";
+import VoteClientShell from "@/components/custom/VoteClientShell";
+import CommentSection from "@/components/server-side/CommentSection";
 import { db } from "@/lib/db";
+import { formatTimeToNow } from "@/lib/utils";
+import { Loader2 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { formatTimeToNow } from "@/lib/utils";
-import { ArrowBigDown, ArrowBigUp, Loader2, StarHalf } from "lucide-react";
-import { buttonVariants } from "@/components/custom/Button";
-import VoteClientShell from "@/components/custom/VoteClientShell";
 
 interface pageProps {
   searchParams: {
@@ -70,44 +69,16 @@ const page = async ({ searchParams: { info } }: pageProps) => {
             {title}
           </h1>
 
-          <EditorOutput data={content} />
+          <EditorOutput data={JSON.stringify(content)} />
           <Suspense
             fallback={
               <Loader2 className="h-5 w-5 animate-spin text-zinc-500" />
             }
           >
-            {/* ts-expect-error Server Component */}
+            {/* @ts-expect-error Server Component */}
             <CommentSection postId={id} />
           </Suspense>
         </div>
-      </div>
-    </div>
-  );
-
-  return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-2">
-        <div className="flex shrink flex-col items-center justify-center gap-1.5">
-          <PostVote postId={id} />
-        </div>
-        {/* Post Details */}
-        <div className="flex grow flex-col gap-3 rounded-md bg-white/10 p-6">
-          {/* Post Header */}
-          <div className="flex justify-between gap-2">
-            <h2 className="text-2xl font-semibold">{title}</h2>
-            <p className="flex gap-2">
-              <span>u/{authorId}</span>
-              <span>@</span>
-              <span>{createdAt.toISOString()}</span>
-            </p>
-          </div>
-          {/* Output Component for editor json */}
-          <EditorOutput data={JSON.stringify(content)} />
-        </div>
-      </div>
-      {/* Comment Buttons */}
-      <div className="rounded-md bg-white/10 p-2">
-        <CommentSection postId={id} />
       </div>
     </div>
   );

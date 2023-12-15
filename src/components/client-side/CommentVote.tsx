@@ -10,45 +10,25 @@ import Animations from "../custom/Animations";
 
 interface CommentVoteProps {
   commentId: string;
+  votesAmt: number;
+  currentVote: CVote | undefined;
 }
 
-const CommentVote: FC<CommentVoteProps> = ({ commentId }) => {
+const CommentVote: FC<CommentVoteProps> = ({
+  commentId,
+  votesAmt,
+  currentVote,
+}) => {
   // VOTE URL FOR THE API REQUEST
   const voteUrl = `/api/comment/${commentId}/vote`;
 
-  const { data: session } = useSession();
-  const [votes, setVotes] = useState<CVote[]>();
-
-  const totalVoteEffect = votes ? voteCounter(votes.map((v) => v.type)) : 0;
-  var currentUserVoteType: VoteType | undefined = undefined;
-  if (session && votes) {
-    const currentUserVote = votes.find((v) => v.userId === session.user.id);
-    currentUserVoteType = currentUserVote?.type;
-  }
-
-  useEffect(() => {
-    const getCommentVotes = async () => {
-      try {
-        const { data: commentVotes } = await axios.get<CVote[]>(voteUrl);
-        setVotes(commentVotes);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    getCommentVotes();
-  }, []);
-
   return (
-    <div className={cn("flex gap-1", !votes && "items-center justify-center")}>
-      {votes ? (
-        <VoteClient
-          totalVoteEffect={totalVoteEffect}
-          voteUrl={voteUrl}
-          currentUserVoteType={currentUserVoteType}
-        />
-      ) : (
-        <Animations.spinner className="h-4 w-4" />
-      )}
+    <div className="flex gap-1">
+      <VoteClient
+        totalVoteEffect={votesAmt}
+        voteUrl={voteUrl}
+        currentUserVoteType={currentVote?.type}
+      />
     </div>
   );
 };

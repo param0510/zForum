@@ -80,7 +80,7 @@ export const CreatePost: FC<CreatePostProps> = ({
       } else if (error instanceof ZodError) {
         return toast({
           title: "Error: Invalid data format",
-          description: error.message,
+          description: "Title and Content both are required",
           variant: "destructive",
         });
       }

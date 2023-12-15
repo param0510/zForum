@@ -7,7 +7,6 @@ import { FC, useCallback, useEffect, useRef } from "react";
 import PostView from "./PostView";
 
 interface PostListProps {
-  // slug: string;
   initialPosts: ExtendedPost[];
   communityId?: string;
 }
@@ -90,11 +89,11 @@ const PostList: FC<PostListProps> = ({ communityId, initialPosts }) => {
   // Posts list being laid out in the UI
   // .flat() is very important as it flatens the array of pages: (Post[])[] -> Post[]
   // console log to understand the structure better
-  const posts = data?.pages.flatMap((page) => page) ?? initialPosts;
+  // const posts = data?.pages.flatMap((page) => page) ?? initialPosts;
 
-  const content = posts.map((post: ExtendedPost, i) => {
+  const content = data?.pages?.flat()?.map((post: ExtendedPost, i) => {
     // Checking if the post is the last one in the array
-    if (posts.length - 1 === i) {
+    if (data?.pages?.flat().length - 1 === i) {
       return (
         <li key={post.id} ref={lastPostCallback}>
           <PostView

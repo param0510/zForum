@@ -2,36 +2,28 @@
 import { CreateCommentPayload } from "@/lib/validators/comment";
 import { Comment } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { Check, Loader2, X } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { Dispatch, FC, SetStateAction, useState } from "react";
 import { Button } from "../custom/Button";
+import { Label } from "../shadcn-ui/Label";
+import { Textarea } from "../shadcn-ui/Textarea";
+import { useCustomToasts } from "@/hooks/use-custom-toasts";
+import { toast } from "@/hooks/use-toast";
 
 interface CreateCommentProps {
   postId: string;
   replyToId?: string;
-  setReplyMode?: Dispatch<SetStateAction<boolean>>;
 }
 
-const CreateComment: FC<CreateCommentProps> = ({
-  postId,
-  replyToId,
-  setReplyMode,
-}) => {
+const CreateComment: FC<CreateCommentProps> = ({ postId, replyToId }) => {
   const [input, setInput] = useState<string>("");
-  const { data: session } = useSession();
+  const { loginToast } = useCustomToasts();
   const router = useRouter();
   const { mutate: postComment, isLoading } = useMutation({
     mutationFn: async () => {
-      if (!input.trim().length) {
-        // display a validation error
-        throw new Error("Comment text is required");
-      }
-      if (!session?.user) {
-        throw new Error("Unauthorized user");
-      }
       const payload: CreateCommentPayload = {
         text: input.trim(),
         replyToId,
@@ -42,64 +34,57 @@ const CreateComment: FC<CreateCommentProps> = ({
       );
       return data;
     },
-    onError(error) {
-      console.log("Error:", error);
-    },
-    onSuccess(comment) {
-      console.log("Created Comment", comment);
-      setInput("");
-      if (setReplyMode) {
-        setReplyMode(false);
+    onError(err) {
+      if (err instanceof AxiosError) {
+        if (err.response?.status === 401) {
+          return loginToast();
+        }
+        if (err.response?.status === 400) {
+          return toast({
+            title: "Invalid comment",
+            description: "Comment text is required",
+            variant: "destructive",
+          });
+        }
       }
-      // const commentData: CommentData = {
-      //   ...comment,
-      //   author: {
-      //     image: session?.user.image ?? "",
-      //     username: session?.user.username ?? "",
-      //   },
-      // };
+
+      return toast({
+        title: "Something went wrong.",
+        description: "Comment wasn't created successfully. Please try again.",
+        variant: "destructive",
+      });
     },
-    onSettled() {
+    onSuccess() {
+      setInput("");
       router.refresh();
     },
   });
 
   return (
-    <div className="flex w-full items-center gap-2">
-      <input
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyUp={(e) => e.key === "Enter" && postComment()}
-        placeholder="Create a comment here"
-        className="grow rounded-sm p-2"
-      />
-      {!setReplyMode ? (
-        <Button isLoading={isLoading} onClick={() => postComment()}>
-          Comment
-        </Button>
-      ) : (
-        <>
-          {isLoading ? (
-            <Loader2 size={20} className="animate-spin" />
-          ) : (
-            <>
-              <X
-                size={20}
-                className="cursor-pointer"
-                onClick={() => {
-                  setInput("");
-                  setReplyMode(false);
-                }}
-              />
-              <Check
-                size={20}
-                className="cursor-pointer"
-                onClick={() => postComment()}
-              />
-            </>
-          )}
-        </>
-      )}
+    <div className="grid w-full gap-1.5">
+      <Label htmlFor="comment">Your comment</Label>
+      <div className="mt-2">
+        <Textarea
+          id="comment"
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          // onKeyUp={(e) =>
+          //   e.key === "Enter" && input.trim().length ? postComment() : null
+          // }
+          rows={1}
+          placeholder="What are your thoughts?"
+        />
+
+        <div className="mt-2 flex justify-end">
+          <Button
+            isLoading={isLoading}
+            disabled={input.trim().length === 0}
+            onClick={() => postComment()}
+          >
+            Post
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

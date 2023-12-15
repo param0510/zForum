@@ -125,31 +125,6 @@ const VoteClient: FC<VoteClientProps> = ({
       </Button>
     </>
   );
-
-  return (
-    <>
-      <button
-        disabled={isLoading}
-        onClick={() => vote("UP")}
-        className="cursor-pointer"
-      >
-        <ThumbsUp
-          className={activeVoteType === VoteType.UP ? "fill-emerald-800" : ""}
-        />
-      </button>
-      {/* {isLoading ? <Loader2 className="animate-spin" /> : voteCount} */}
-      {voteCount}
-      <button
-        disabled={isLoading}
-        onClick={() => vote("DOWN")}
-        className="cursor-pointer"
-      >
-        <ThumbsDown
-          className={activeVoteType === VoteType.DOWN ? "fill-orange-800" : ""}
-        />
-      </button>
-    </>
-  );
 };
 
 export default VoteClient;

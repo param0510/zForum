@@ -48,7 +48,7 @@ const PostView = ({ post, communityNameSlug, commentAmt }: PostViewProps) => {
             className="relative max-h-40 w-full overflow-clip text-sm"
             ref={pRef}
           >
-            <EditorOutput data={post.content} />
+            <EditorOutput data={JSON.stringify(post.content)} />
             {pRef.current?.clientHeight === 160 ? (
               // blur bottom if content is too long
               <div className="absolute bottom-0 left-0 h-24 w-full bg-gradient-to-t from-white to-transparent"></div>

@@ -15,7 +15,6 @@ import UserAvatar from "../custom/UserAvatar";
 
 // props
 interface UserAccountNavProps {
-  // session: Session | null;
   user: Pick<User, "email" | "name" | "image">;
 }
 
