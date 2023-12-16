@@ -3,7 +3,7 @@ import "@/styles/editor.css";
 import EditorJS from "@editorjs/editorjs";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { FC, MutableRefObject, RefObject, useCallback, useEffect } from "react";
+import { FC, MutableRefObject, useCallback, useEffect } from "react";
 
 interface EditorProps {
   editorRef: MutableRefObject<{ editor: EditorJS } | undefined>;

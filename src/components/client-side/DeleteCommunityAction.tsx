@@ -44,7 +44,7 @@ const DeleteCommunityAction: FC<DeleteCommunityActionProps> = ({
         variant: "destructive",
       });
     },
-    onSuccess(_) {
+    onSuccess() {
       toast({
         title: "Deleted!",
         description: `You have now successfully deleted c/${communityName}`,

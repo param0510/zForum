@@ -1,14 +1,11 @@
 "use client";
-import { cn, voteCounter } from "@/lib/utils";
+import { voteCounter } from "@/lib/utils";
 import { PostVote as PVote, VoteType } from "@prisma/client";
+import axios from "axios";
 import { useSession } from "next-auth/react";
 import { FC, useEffect, useState } from "react";
-import VoteClient from "./VoteClient";
-import axios from "axios";
-import { ArrowBigDown, ArrowBigUp, Loader2 } from "lucide-react";
-import Animations from "../custom/Animations";
-import { buttonVariants } from "../custom/Button";
 import VoteClientShell from "../custom/VoteClientShell";
+import VoteClient from "./VoteClient";
 
 interface PostVoteProps {
   postId: string;

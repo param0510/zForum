@@ -1,17 +1,15 @@
 "use client";
+import { useCustomToasts } from "@/hooks/use-custom-toasts";
+import { toast } from "@/hooks/use-toast";
 import { CreateCommunityPayloadSchema } from "@/lib/validators/community";
-import { Community } from "@prisma/client";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { useSession } from "next-auth/react";
+import debounce from "lodash.debounce";
 import { useRouter } from "next/navigation";
-import { FC, useCallback, useEffect, useState } from "react";
+import { FC, useCallback, useState } from "react";
 import { ZodError } from "zod";
 import { Button } from "../custom/Button";
-import { useCustomToasts } from "@/hooks/use-custom-toasts";
 import { Input } from "../shadcn-ui/Input";
-import debounce from "lodash.debounce";
-import { toast } from "@/hooks/use-toast";
 
 interface CreateCommunityClientProps {
   existingCommunityNames: string[];
@@ -92,7 +90,7 @@ const CreateCommunityClient: FC<CreateCommunityClientProps> = ({
           </p>
           <div className="relative">
             <p className="absolute inset-y-0 left-0 grid w-8 place-items-center text-sm text-zinc-400">
-              r/
+              c/
             </p>
             <Input
               autoFocus={true}

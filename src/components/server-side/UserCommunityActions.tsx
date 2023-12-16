@@ -1,8 +1,7 @@
 import { db } from "@/lib/db";
 import { Session } from "next-auth";
-import SubscriptionToggleAction from "../client-side/SubscriptionToggleAction";
-import { Button } from "../custom/Button";
 import DeleteCommunityAction from "../client-side/DeleteCommunityAction";
+import SubscriptionToggleAction from "../client-side/SubscriptionToggleAction";
 
 interface UserCommunityActionsProps {
   creatorId: string;

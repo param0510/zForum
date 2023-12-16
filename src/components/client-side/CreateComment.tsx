@@ -1,17 +1,15 @@
 "use client";
+import { useCustomToasts } from "@/hooks/use-custom-toasts";
+import { toast } from "@/hooks/use-toast";
 import { CreateCommentPayload } from "@/lib/validators/comment";
 import { Comment } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { Check, Loader2, X } from "lucide-react";
-import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Dispatch, FC, SetStateAction, useState } from "react";
+import { FC, useState } from "react";
 import { Button } from "../custom/Button";
 import { Label } from "../shadcn-ui/Label";
 import { Textarea } from "../shadcn-ui/Textarea";
-import { useCustomToasts } from "@/hooks/use-custom-toasts";
-import { toast } from "@/hooks/use-toast";
 
 interface CreateCommentProps {
   postId: string;

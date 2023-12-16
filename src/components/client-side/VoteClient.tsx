@@ -1,14 +1,14 @@
 "use client";
 import { useCustomToasts } from "@/hooks/use-custom-toasts";
 import { toast } from "@/hooks/use-toast";
+import { cn } from "@/lib/utils";
 import { usePrevious } from "@mantine/hooks";
 import { VoteType } from "@prisma/client";
 import { useMutation } from "@tanstack/react-query";
 import axios, { AxiosError } from "axios";
-import { ArrowBigDown, ArrowBigUp, ThumbsDown, ThumbsUp } from "lucide-react";
+import { ArrowBigDown, ArrowBigUp } from "lucide-react";
 import { FC, useEffect, useState } from "react";
 import { Button } from "../custom/Button";
-import { cn } from "@/lib/utils";
 
 interface VoteClientProps {
   totalVoteEffect: number;
@@ -27,7 +27,7 @@ const VoteClient: FC<VoteClientProps> = ({
   const previousVoteType = usePrevious(currentUserVoteType);
   const { loginToast } = useCustomToasts();
 
-  const { mutate: vote, isLoading } = useMutation({
+  const { mutate: vote } = useMutation({
     onMutate(voteType) {
       if (activeVoteType === voteType) {
         // User is voting the same way again, so remove their vote
@@ -66,8 +66,6 @@ const VoteClient: FC<VoteClientProps> = ({
 
       if (err instanceof AxiosError) {
         if (err.response?.status === 401) {
-          console.log("axios error");
-
           return loginToast();
         }
       }

@@ -3,6 +3,7 @@ import PostList from "@/components/client-side/PostList";
 import { INFINITE_SCROLL_PAGINATION_RESULTS } from "@/config";
 import { getServerAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
+import { notFound } from "next/navigation";
 
 interface CommunityViewPageProps {
   params: {
@@ -41,7 +42,7 @@ const CommunityViewPage = async ({
   });
 
   if (!communityDetails) {
-    return;
+    return notFound();
   }
 
   return (

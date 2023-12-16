@@ -5,7 +5,7 @@ import { getServerAuthSession } from "@/lib/auth";
 import { HomeIcon } from "lucide-react";
 import Link from "next/link";
 
-// Check these
+// Required for vercel deployment to prevent stale data representation due to vercel's caching model
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
 

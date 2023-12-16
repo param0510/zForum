@@ -7,6 +7,7 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/shadcn-ui/Command";
+import { toast } from "@/hooks/use-toast";
 import { Community } from "@prisma/client";
 import axios from "axios";
 import debounce from "lodash.debounce";
@@ -22,7 +23,7 @@ const SearchBar = () => {
   const [emptyIsShowing, setEmptyIsShowing] = useState(false);
 
   const getCommunites = async (nameQuery: string) => {
-    console.log("fetch is run");
+    // console.log("fetch is run");
     try {
       setIsLoading(true);
       const { data } = await axios.get<Community[]>(
@@ -30,7 +31,11 @@ const SearchBar = () => {
       );
       setCommunities(data.map(({ name }) => name));
     } catch (error) {
-      console.log(error);
+      toast({
+        title: "Something went wrong!",
+        description: "Couldn't fetch communities. Please try again later",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
       setEmptyIsShowing(true);

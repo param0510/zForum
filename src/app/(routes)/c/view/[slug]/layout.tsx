@@ -4,7 +4,7 @@ import { getServerAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { format } from "date-fns";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import ToFeedButton from "@/components/client-side/ToFeedButton";
 
 interface CommunityViewLayoutProps {
@@ -26,7 +26,8 @@ const CommunityViewLayout = async ({
   });
   // If the community doesn't exist redirect to 404 page
   if (!communityDetails) {
-    return notFound();
+    redirect("/");
+    return notFound(); // This works but the colors are not compatible with our light theme. (Text color is white - can't be seen)
   }
   const memberCount = await db.subscription.count({
     where: {

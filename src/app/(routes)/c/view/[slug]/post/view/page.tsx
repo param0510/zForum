@@ -8,6 +8,10 @@ import { Loader2 } from "lucide-react";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 
+// Required for vercel deployment to prevent stale data representation due to vercel's caching model
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 interface pageProps {
   searchParams: {
     info: string;
@@ -36,7 +40,7 @@ const page = async ({ searchParams: { info } }: pageProps) => {
   if (!postDetails) {
     return notFound();
   }
-  const { id, authorId, createdAt, title, content, author } = postDetails;
+  const { id, createdAt, title, content, author } = postDetails;
 
   return (
     <div>

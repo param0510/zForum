@@ -1,8 +1,5 @@
 import { CreatePost } from "@/components/client-side/CreatePost";
-import { Button, buttonVariants } from "@/components/custom/Button";
 import { db } from "@/lib/db";
-import { cn } from "@/lib/utils";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 interface CreatePostPageProps {

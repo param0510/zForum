@@ -1,7 +1,5 @@
 import CreateCommunityClient from "@/components/client-side/CreateCommunityClient";
-import { Button } from "@/components/custom/Button";
 import { db } from "@/lib/db";
-import React from "react";
 
 const CreateCommunityPage = async () => {
   const existingCommunities = await db.community.findMany({

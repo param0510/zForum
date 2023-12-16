@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
       responseObj.link;
       // console.log("resp", responseObj);
 
-      const resultString = JSON.stringify(result);
+      // const resultString = JSON.stringify(result);
       // console.log("resultString", resultString);
       return new NextResponse(JSON.stringify(responseObj), { status: 200 });
     } else {
@@ -59,7 +59,7 @@ export async function GET(req: NextRequest) {
       link: "",
       meta: {},
     };
-    console.error("Error fetching metadata:", error);
+    // console.error("Error fetching metadata:", error);
     return new NextResponse(JSON.stringify(error), { status: 500 });
   }
 }

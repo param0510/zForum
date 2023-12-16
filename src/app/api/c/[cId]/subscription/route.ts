@@ -52,12 +52,12 @@ export async function PATCH(
       },
     });
     if (!activeSubscription) {
-      const createdSubscription = await db.subscription.create({
+      await db.subscription.create({
         data: { communityId, userId: session.user.id },
       });
       return new Response("User subcription created", { status: 201 });
     }
-    const deleteSubscription = await db.subscription.delete({
+    await db.subscription.delete({
       where: {
         userId_communityId: {
           userId: session.user.id,

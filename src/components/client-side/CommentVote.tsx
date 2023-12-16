@@ -1,12 +1,7 @@
 "use client";
-import { cn, voteCounter } from "@/lib/utils";
-import { CommentVote as CVote, VoteType } from "@prisma/client";
-import { useSession } from "next-auth/react";
-import { FC, useEffect, useState } from "react";
+import { CommentVote as CVote } from "@prisma/client";
+import { FC } from "react";
 import VoteClient from "./VoteClient";
-import axios from "axios";
-import { Loader2 } from "lucide-react";
-import Animations from "../custom/Animations";
 
 interface CommentVoteProps {
   commentId: string;

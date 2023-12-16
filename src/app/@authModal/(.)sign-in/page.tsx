@@ -1,6 +1,5 @@
 import CloseModal from "@/components/client-side/CloseModal";
 import SignIn from "@/components/server-side/SignIn";
-import { useRouter } from "next/navigation";
 
 const SignInModal = () => {
   return (

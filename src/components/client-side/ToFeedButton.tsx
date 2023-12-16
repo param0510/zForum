@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, Home, School2, Tv } from "lucide-react";
+import { ChevronLeft, Home, Tv } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { buttonVariants } from "../custom/Button";
 

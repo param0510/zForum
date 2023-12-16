@@ -1,25 +1,23 @@
 "use client";
-import { FC, useEffect, useRef } from "react";
-import { Button } from "../custom/Button";
-import Editor from "../custom/Editor";
-import EditorJS from "@editorjs/editorjs";
-import axios, { AxiosError } from "axios";
-import { useForm } from "react-hook-form";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useCustomToasts } from "@/hooks/use-custom-toasts";
+import { toast } from "@/hooks/use-toast";
 import {
-  CreatePostPayload,
   CreatePostPayloadSchema,
   PostTitleValidation,
   PostTitleValidationSchema,
 } from "@/lib/validators/post";
-import { Post } from "@prisma/client";
-import z, { ZodError } from "zod";
-import TextareaAutosize from "react-textarea-autosize";
+import EditorJS from "@editorjs/editorjs";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "@/hooks/use-toast";
-import { useCustomToasts } from "@/hooks/use-custom-toasts";
+import { Post } from "@prisma/client";
+import { useMutation } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
+import { useRouter } from "next/navigation";
+import { FC, useEffect, useRef } from "react";
+import { useForm } from "react-hook-form";
+import TextareaAutosize from "react-textarea-autosize";
+import { ZodError } from "zod";
+import { Button } from "../custom/Button";
+import Editor from "../custom/Editor";
 
 interface CreatePostProps {
   communityId: string;
@@ -90,7 +88,7 @@ export const CreatePost: FC<CreatePostProps> = ({
         variant: "destructive",
       });
     },
-    onSuccess(_) {
+    onSuccess() {
       // console.log("Post Created Successfully", data);
       router.push(`/c/view/${communityName}`);
       router.refresh();
