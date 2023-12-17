@@ -53,7 +53,7 @@ const CustomFeed = async () => {
     take: INFINITE_SCROLL_PAGINATION_RESULTS,
   });
 
-  return !posts.length ? (
+  return posts.length ? (
     <PostList initialPosts={posts} />
   ) : (
     // If user hasn't followed or created any communities
