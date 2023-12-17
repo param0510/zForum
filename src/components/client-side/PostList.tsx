@@ -116,32 +116,6 @@ const PostList: FC<PostListProps> = ({ communityId, initialPosts }) => {
     );
   });
 
-  // Posts list being laid out in the UI
-  // .flat() is very important as it flatens the array of pages: (Post[])[] -> Post[]
-  // console log to understand the structure better
-
-  // const content = data?.pages.flat().map((post: ExtendedPost, i) => {
-  //   // Checking if the post is the last one in the array
-  //   if (data.pages.flat().length - 1 === i) {
-  //     return (
-  //       <PostView
-  //         post={post}
-  //         // we only set the lastPostCallback for the last post in the flattened pages array
-  //         innerRef={lastPostCallback}
-  //         communityNameSlug={post.community.name}
-  //         key={post.id}
-  //       />
-  //     );
-  //   }
-  //   return (
-  //     <PostView
-  //       post={post}
-  //       communityNameSlug={post.community.name}
-  //       key={post.id}
-  //     />
-  //   );
-  // });
-
   return (
     <ul className="col-span-2 flex flex-col space-y-6">
       {content}

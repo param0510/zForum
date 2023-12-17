@@ -29,22 +29,14 @@ const UserCommunityActions = async ({
   const isUserSubscribed = !!subscriptionStatus;
 
   return (
-    <SubscriptionToggleAction
-      isSubscribed={isUserSubscribed}
-      communityId={communityId}
-      communityName={communityName}
-    />
-  );
-
-  // DELETE COMMUNITY FUNCTION ONLY WORKS IF THERE ARE NO POST WITH COMMENTS HAVING REPLIES. PRISMA SCHEMA PROBLEM
-  return (
     <>
-      {session?.user.id === creatorId ? (
-        <DeleteCommunityAction
-          communityId={communityId}
-          communityName={communityName}
-        />
-      ) : (
+      {session?.user.id ===
+      creatorId ? // DELETE COMMUNITY FUNCTION ONLY WORKS IF THERE ARE NO POST WITH COMMENTS HAVING REPLIES. PRISMA SCHEMA PROBLEM - WORK ON THIS LATER
+      // <DeleteCommunityAction
+      //   communityId={communityId}
+      //   communityName={communityName}
+      // />
+      null : (
         <SubscriptionToggleAction
           isSubscribed={isUserSubscribed}
           communityId={communityId}
