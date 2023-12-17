@@ -7,13 +7,14 @@ import {
   CommandItem,
   CommandList,
 } from "@/components/shadcn-ui/Command";
+import { useOnClickOutside } from "@/hooks/use-on-click-outside";
 import { toast } from "@/hooks/use-toast";
 import { Community } from "@prisma/client";
 import axios from "axios";
 import debounce from "lodash.debounce";
 import { Users } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 
 const SearchBar = () => {
   const [input, setInput] = useState("");
@@ -21,6 +22,12 @@ const SearchBar = () => {
   const [communities, setCommunities] = useState<string[]>();
   const [isLoading, setIsLoading] = useState(false);
   const [emptyIsShowing, setEmptyIsShowing] = useState(false);
+  const commandRef = useRef<HTMLDivElement>(null);
+
+  // Used for detecting any blur events on the search bar
+  useOnClickOutside(commandRef, () => {
+    setInput("");
+  });
 
   const getCommunites = async (nameQuery: string) => {
     // console.log("fetch is run");
@@ -59,7 +66,10 @@ const SearchBar = () => {
 
   return (
     <div className="max-w-lg grow">
-      <Command className="relative z-50 overflow-visible rounded-lg border">
+      <Command
+        ref={commandRef}
+        className="relative z-50 overflow-visible rounded-lg border"
+      >
         <CommandInput
           isLoading={isLoading}
           className="border-none outline-none ring-0 focus:border-none focus:outline-none"
