@@ -2,8 +2,6 @@ import { db } from "@/lib/db";
 import { INFINITE_SCROLL_PAGINATION_RESULTS } from "@/config";
 import PostList from "../client-side/PostList";
 
-export const dynamic = "force-dynamic";
-export const fetchCache = "force-no-store";
 const GeneralFeed = async () => {
   const posts = await db.post.findMany({
     orderBy: {
