@@ -33,7 +33,6 @@ export const CreatePost: FC<CreatePostProps> = ({
   const { loginToast } = useCustomToasts();
   const {
     register,
-    // getValues: getFormValues,
     formState: { errors },
     handleSubmit,
   } = useForm<PostTitleValidation>({
@@ -42,6 +41,10 @@ export const CreatePost: FC<CreatePostProps> = ({
       title: "",
     },
   });
+
+  const _titleRef = useRef<HTMLTextAreaElement | null>(null);
+  const { ref: titleRef, ...rest } = register("title");
+
   // Get editor data
   const getEditorData = () => {
     return editorRef.current?.editor
@@ -121,13 +124,16 @@ export const CreatePost: FC<CreatePostProps> = ({
         >
           <div className="prose prose-stone dark:prose-invert">
             <TextareaAutosize
-              {...register("title")}
-              autoFocus={true}
+              ref={(e) => {
+                titleRef(e);
+                _titleRef.current = e;
+              }}
+              // {...register("title")}
+              // autoFocus={true}
               placeholder="Title"
               className="w-full resize-none appearance-none overflow-hidden bg-transparent text-5xl font-bold focus:outline-none"
             />
-            {/* <div id="editor" className="min-h-[500px]" /> */}
-            <Editor editorRef={editorRef} />
+            <Editor editorRef={editorRef} _titleRef={_titleRef} />
             <p className="text-sm text-gray-500">
               Use{" "}
               <kbd className="rounded-md border bg-muted px-1 text-xs uppercase">

@@ -3,13 +3,14 @@ import "@/styles/editor.css";
 import EditorJS from "@editorjs/editorjs";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { FC, MutableRefObject, useCallback, useEffect } from "react";
+import { FC, MutableRefObject, RefObject, useCallback, useEffect } from "react";
 
 interface EditorProps {
   editorRef: MutableRefObject<{ editor: EditorJS } | undefined>;
+  _titleRef: RefObject<HTMLTextAreaElement | null>;
 }
 
-const Editor: FC<EditorProps> = ({ editorRef }) => {
+const Editor: FC<EditorProps> = ({ editorRef, _titleRef }) => {
   const { data: session } = useSession();
 
   const router = useRouter();
@@ -93,6 +94,9 @@ const Editor: FC<EditorProps> = ({ editorRef }) => {
       inlineToolbar: true,
       onReady: () => {
         editorRef.current = { editor };
+        setTimeout(() => {
+          _titleRef.current?.focus();
+        }, 300);
       },
     });
   }, []);
