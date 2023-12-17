@@ -53,7 +53,7 @@ const CustomFeed = async () => {
     take: INFINITE_SCROLL_PAGINATION_RESULTS,
   });
 
-  return posts.length ? (
+  return !posts.length ? (
     <PostList initialPosts={posts} />
   ) : (
     // If user hasn't followed or created any communities
@@ -67,7 +67,7 @@ const CustomFeed = async () => {
       <div>
         <p className="mb-2 text-lg font-semibold">Feed Inactive!</p>
         <p className="text-sm">
-          Looks like you haven't{" "}
+          Looks like you haven&apos;t{" "}
           <strong className="font-semibold">followed</strong> or{" "}
           <strong className="font-semibold">created</strong> any communities!
           Feel free to participate and contribute to ForumZ.
